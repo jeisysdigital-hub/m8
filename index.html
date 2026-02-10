@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Morpheus8 Owner Density Analysis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: #2d3748;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .card-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .card-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+            color: #718096;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            font-weight: 600;
+        }
+        
+        .tab:hover {
+            color: #667eea;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .search-box {
+            width: 100%;
+            padding: 12px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1em;
+            margin-bottom: 20px;
+            transition: border-color 0.3s;
+        }
+        
+        .search-box:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        
+        th {
+            background: #f7fafc;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #2d3748;
+            border-bottom: 2px solid #e2e8f0;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        th:hover {
+            background: #edf2f7;
+        }
+        
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        tr:hover {
+            background: #f7fafc;
+        }
+        
+        .count-badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+        
+        .rank {
+            color: #a0aec0;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+        
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 8px 16px;
+            border: 2px solid #e2e8f0;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9em;
+        }
+        
+        .filter-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+        
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .sort-indicator {
+            margin-left: 5px;
+            font-size: 0.8em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Morpheus8 Owner Density Analysis</h1>
+            <p style="color: #718096; margin-top: 10px;">Target market analysis for strategic planning</p>
+            
+            <div class="summary-cards">
+                <div class="card">
+                    <div class="card-label">Total Morpheus8 Owners</div>
+                    <div class="card-value">5,401</div>
+                </div>
+                <div class="card">
+                    <div class="card-label">Cities with 12+ Owners</div>
+                    <div class="card-value">69</div>
+                </div>
+                <div class="card">
+                    <div class="card-label">High-Density Zip Codes</div>
+                    <div class="card-value">174</div>
+                </div>
+                <div class="card">
+                    <div class="card-label">Top City</div>
+                    <div class="card-value" style="font-size: 1.5em;">NYC</div>
+                    <div class="card-label">146 owners</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('cities')">By City</button>
+                <button class="tab" onclick="switchTab('zipcodes')">By Zip Code</button>
+            </div>
+            
+            <div id="cities" class="tab-content active">
+                <input type="text" id="citySearch" class="search-box" placeholder="🔍 Search cities..." onkeyup="filterTable('cityTable', 'citySearch')">
+                
+                <div class="filter-buttons">
+                    <button class="filter-btn active" onclick="filterByCount('city', 0)">All Cities</button>
+                    <button class="filter-btn" onclick="filterByCount('city', 12)">12+ Owners</button>
+                    <button class="filter-btn" onclick="filterByCount('city', 20)">20+ Owners</button>
+                    <button class="filter-btn" onclick="filterByCount('city', 30)">30+ Owners</button>
+                </div>
+                
+                <table id="cityTable">
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable('cityTable', 0, 'num')"># <span class="sort-indicator">▼</span></th>
+                            <th onclick="sortTable('cityTable', 1, 'str')">City</th>
+                            <th onclick="sortTable('cityTable', 2, 'str')">State</th>
+                            <th onclick="sortTable('cityTable', 3, 'num')">Owner Count</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cityTableBody">
+                    </tbody>
+                </table>
+            </div>
+            
+            <div id="zipcodes" class="tab-content">
+                <input type="text" id="zipSearch" class="search-box" placeholder="🔍 Search zip codes..." onkeyup="filterTable('zipTable', 'zipSearch')">
+                
+                <div class="filter-buttons">
+                    <button class="filter-btn active" onclick="filterByCount('zip', 0)">All Zip Codes</button>
+                    <button class="filter-btn" onclick="filterByCount('zip', 5)">5+ Owners</button>
+                    <button class="filter-btn" onclick="filterByCount('zip', 10)">10+ Owners</button>
+                    <button class="filter-btn" onclick="filterByCount('zip', 15)">15+ Owners</button>
+                </div>
+                
+                <table id="zipTable">
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable('zipTable', 0, 'num')"># <span class="sort-indicator">▼</span></th>
+                            <th onclick="sortTable('zipTable', 1, 'num')">Zip Code</th>
+                            <th onclick="sortTable('zipTable', 2, 'str')">City</th>
+                            <th onclick="sortTable('zipTable', 3, 'str')">State</th>
+                            <th onclick="sortTable('zipTable', 4, 'num')">Owner Count</th>
+                        </tr>
+                    </thead>
+                    <tbody id="zipTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // City data
+        const cityData = [
+            ["New York", "NY", 146],
+            ["Miami", "FL", 110],
+            ["Los Angeles", "CA", 72],
+            ["Beverly Hills", "CA", 71],
+            ["Houston", "TX", 57],
+            ["Chicago", "IL", 46],
+            ["Las Vegas", "NV", 41],
+            ["Austin", "TX", 39],
+            ["Atlanta", "GA", 39],
+            ["Scottsdale", "AZ", 38],
+            ["San Antonio", "TX", 37],
+            ["Dallas", "TX", 37],
+            ["Tampa", "FL", 36],
+            ["Denver", "CO", 31],
+            ["Boca Raton", "FL", 31],
+            ["San Diego", "CA", 28],
+            ["Newport Beach", "CA", 26],
+            ["Oklahoma City", "OK", 26],
+            ["Fort Lauderdale", "FL", 26],
+            ["Brooklyn", "NY", 26],
+            ["Orlando", "FL", 25],
+            ["Hollywood", "FL", 25],
+            ["Phoenix", "AZ", 25],
+            ["Plano", "TX", 24],
+            ["Tulsa", "OK", 21],
+            ["Charlotte", "NC", 21],
+            ["Glendale", "CA", 20],
+            ["Colorado Springs", "CO", 20],
+            ["Nashville", "TN", 20],
+            ["Hialeah", "FL", 20],
+            ["Pasadena", "CA", 19],
+            ["Seattle", "WA", 19],
+            ["Aventura", "FL", 19],
+            ["Santa Monica", "CA", 18],
+            ["Encino", "CA", 18],
+            ["San Jose", "CA", 18],
+            ["San Francisco", "CA", 18],
+            ["Torrance", "CA", 17],
+            ["Oklahoma", "OK", 17],
+            ["Carmel", "IN", 17],
+            ["West Palm Beach", "FL", 17],
+            ["Brentwood", "TN", 16],
+            ["Pembroke Pines", "FL", 16],
+            ["Sarasota", "FL", 16],
+            ["Portland", "OR", 16],
+            ["Irvine", "CA", 15],
+            ["Coral Gables", "FL", 15],
+            ["Lakewood", "CO", 15],
+            ["McLean", "VA", 14],
+            ["Tulsa", "OK", 14],
+            ["Frisco", "TX", 14],
+            ["Burbank", "CA", 14],
+            ["Memphis", "TN", 14],
+            ["West Hollywood", "CA", 13],
+            ["Buffalo", "NY", 13],
+            ["Fort Worth", "TX", 13],
+            ["Midland", "TX", 13],
+            ["Englewood", "CO", 13],
+            ["Mclean", "VA", 13],
+            ["McAllen", "TX", 12],
+            ["Birmingham", "AL", 12],
+            ["Westlake Village", "CA", 12],
+            ["Bellevue", "WA", 12],
+            ["Doral", "FL", 12],
+            ["Winter Park", "FL", 12],
+            ["Overland Park", "KS", 12],
+            ["Sunrise", "FL", 11],
+            ["Plantation", "FL", 11],
+            ["Clearwater", "FL", 11]
+        ];
+        
+        // Zip code data
+        const zipData = [
+            [90210, "Beverly Hills", "CA", 37],
+            [90211, "Beverly Hills", "CA", 21],
+            [92660, "Newport Beach", "CA", 20],
+            [10022, "New York", "NY", 18],
+            [10021, "New York", "NY", 17],
+            [10028, "New York", "NY", 15],
+            [60611, "Chicago", "IL", 15],
+            [46032, "Carmel", "IN", 14],
+            [10065, "New York", "NY", 14],
+            [75093, "Plano", "TX", 13],
+            [90212, "Beverly Hills", "CA", 13],
+            [37027, "Brentwood", "TN", 13],
+            [10019, "New York", "NY", 12],
+            [75034, "Frisco", "TX", 12],
+            [90069, "West Hollywood", "CA", 12],
+            [85260, "Scottsdale", "AZ", 11],
+            [33133, "Miami", "FL", 11],
+            [91361, "Westlake Village", "CA", 10],
+            [34239, "Sarasota", "FL", 10],
+            [89117, "Las Vegas", "NV", 10],
+            [33143, "Miami", "FL", 10],
+            [33134, "Miami", "FL", 10],
+            [33016, "Hialeah", "FL", 10],
+            [90505, "Torrance", "CA", 9],
+            [85254, "Scottsdale", "AZ", 9],
+            [14221, "Buffalo", "NY", 9],
+            [78504, "McAllen", "TX", 9],
+            [80111, "Englewood", "CO", 9],
+            [30305, "Atlanta", "GA", 9],
+            [32789, "Winter Park", "FL", 9],
+            [78759, "Austin", "TX", 8],
+            [33160, "North Miami Beach", "FL", 8],
+            [91356, "Tarzana", "CA", 8],
+            [91367, "Woodland Hills", "CA", 8],
+            [90024, "Los Angeles", "CA", 8],
+            [73120, "Oklahoma City", "OK", 8],
+            [90025, "Los Angeles", "CA", 8],
+            [78746, "Austin", "TX", 8],
+            [10023, "New York", "NY", 8],
+            [33179, "Miami", "FL", 8],
+            [60614, "Chicago", "IL", 7],
+            [91206, "Glendale", "CA", 7],
+            [78701, "Austin", "TX", 7],
+            [75205, "Dallas", "TX", 7],
+            [90024, "Los Angeles", "CA", 7],
+            [33126, "Miami", "FL", 7],
+            [22102, "McLean", "VA", 7],
+            [90048, "Los Angeles", "CA", 7],
+            [73134, "Oklahoma City", "OK", 7],
+            [90272, "Pacific Palisades", "CA", 7],
+            [89113, "Las Vegas", "NV", 7],
+            [60610, "Chicago", "IL", 7],
+            [77056, "Houston", "TX", 7],
+            [33180, "Aventura", "FL", 7],
+            [73132, "Oklahoma City", "OK", 7],
+            [33156, "Miami", "FL", 7],
+            [78731, "Austin", "TX", 6],
+            [74137, "Tulsa", "OK", 6],
+            [33021, "Hollywood", "FL", 6],
+            [85018, "Phoenix", "AZ", 6],
+            [91501, "Burbank", "CA", 6],
+            [11201, "Brooklyn", "NY", 6],
+            [90049, "Los Angeles", "CA", 6],
+            [77005, "Houston", "TX", 6],
+            [90401, "Santa Monica", "CA", 6],
+            [33324, "Plantation", "FL", 6],
+            [33020, "Hollywood", "FL", 6],
+            [33167, "Miami", "FL", 6],
+            [33146, "Coral Gables", "FL", 6]
+        ];
+        
+        function renderCityTable() {
+            const tbody = document.getElementById('cityTableBody');
+            tbody.innerHTML = '';
+            cityData.forEach((row, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><span class="rank">${index + 1}</span></td>
+                    <td><strong>${row[0]}</strong></td>
+                    <td>${row[1]}</td>
+                    <td><span class="count-badge">${row[2]}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+        
+        function renderZipTable() {
+            const tbody = document.getElementById('zipTableBody');
+            tbody.innerHTML = '';
+            zipData.forEach((row, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><span class="rank">${index + 1}</span></td>
+                    <td><strong>${row[0]}</strong></td>
+                    <td>${row[1]}</td>
+                    <td>${row[2]}</td>
+                    <td><span class="count-badge">${row[3]}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+        
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        function filterTable(tableId, searchId) {
+            const input = document.getElementById(searchId);
+            const filter = input.value.toUpperCase();
+            const table = document.getElementById(tableId);
+            const tr = table.getElementsByTagName('tr');
+            
+            for (let i = 1; i < tr.length; i++) {
+                const row = tr[i];
+                const text = row.textContent || row.innerText;
+                if (text.toUpperCase().indexOf(filter) > -1) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+        }
+        
+        function filterByCount(type, minCount) {
+            // Update active button
+            event.target.parentElement.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            if (type === 'city') {
+                const tbody = document.getElementById('cityTableBody');
+                const rows = tbody.getElementsByTagName('tr');
+                Array.from(rows).forEach(row => {
+                    const countText = row.cells[3].textContent;
+                    const count = parseInt(countText);
+                    row.style.display = count >= minCount ? '' : 'none';
+                });
+            } else {
+                const tbody = document.getElementById('zipTableBody');
+                const rows = tbody.getElementsByTagName('tr');
+                Array.from(rows).forEach(row => {
+                    const countText = row.cells[4].textContent;
+                    const count = parseInt(countText);
+                    row.style.display = count >= minCount ? '' : 'none';
+                });
+            }
+        }
+        
+        function sortTable(tableId, column, type) {
+            const table = document.getElementById(tableId);
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            
+            const sorted = rows.sort((a, b) => {
+                let aVal = a.cells[column].textContent.trim();
+                let bVal = b.cells[column].textContent.trim();
+                
+                if (type === 'num') {
+                    aVal = parseInt(aVal) || 0;
+                    bVal = parseInt(bVal) || 0;
+                    return bVal - aVal;
+                } else {
+                    return aVal.localeCompare(bVal);
+                }
+            });
+            
+            tbody.innerHTML = '';
+            sorted.forEach(row => tbody.appendChild(row));
+        }
+        
+        // Initialize tables
+        renderCityTable();
+        renderZipTable();
+    </script>
+</body>
+</html>
