@@ -1,547 +1,889 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Morpheus8 Owner Density Analysis</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 20px;
-            min-height: 100vh;
-        }
-        
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-        
-        .header {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            margin-bottom: 20px;
-        }
-        
-        h1 {
-            color: #2d3748;
-            font-size: 2em;
-            margin-bottom: 10px;
-        }
-        
-        .summary-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-        
-        .card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 8px;
-            text-align: center;
-        }
-        
-        .card-value {
-            font-size: 2.5em;
-            font-weight: bold;
-            margin: 10px 0;
-        }
-        
-        .card-label {
-            font-size: 0.9em;
-            opacity: 0.9;
-        }
-        
-        .content {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            margin-bottom: 20px;
-        }
-        
-        .tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #e2e8f0;
-        }
-        
-        .tab {
-            padding: 12px 24px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 1em;
-            color: #718096;
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s;
-        }
-        
-        .tab.active {
-            color: #667eea;
-            border-bottom-color: #667eea;
-            font-weight: 600;
-        }
-        
-        .tab:hover {
-            color: #667eea;
-        }
-        
-        .tab-content {
-            display: none;
-        }
-        
-        .tab-content.active {
-            display: block;
-        }
-        
-        .search-box {
-            width: 100%;
-            padding: 12px 20px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 1em;
-            margin-bottom: 20px;
-            transition: border-color 0.3s;
-        }
-        
-        .search-box:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-        
-        th {
-            background: #f7fafc;
-            padding: 15px;
-            text-align: left;
-            font-weight: 600;
-            color: #2d3748;
-            border-bottom: 2px solid #e2e8f0;
-            cursor: pointer;
-            user-select: none;
-        }
-        
-        th:hover {
-            background: #edf2f7;
-        }
-        
-        td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        
-        tr:hover {
-            background: #f7fafc;
-        }
-        
-        .count-badge {
-            display: inline-block;
-            background: #667eea;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 0.9em;
-        }
-        
-        .rank {
-            color: #a0aec0;
-            font-weight: 600;
-            font-size: 0.9em;
-        }
-        
-        .filter-buttons {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-        
-        .filter-btn {
-            padding: 8px 16px;
-            border: 2px solid #e2e8f0;
-            background: white;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 0.9em;
-        }
-        
-        .filter-btn:hover {
-            border-color: #667eea;
-            color: #667eea;
-        }
-        
-        .filter-btn.active {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
-        }
-        
-        .sort-indicator {
-            margin-left: 5px;
-            font-size: 0.8em;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISR Sales Territory Map v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson@3.0.2/dist/topojson.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:    #0b1622; --bg2: #111e2d; --bg3: #172438; --bg4: #1e2f45;
+  --border: #1f3450; --border2: #2a4260;
+  --text: #e4edf5; --text2: #7a9ab5; --text3: #425d74;
+  --radius: 8px;
+  --isr-alex:   #e8735a; --isr-justin: #4b9dd4; --isr-rachel: #5dbf8e;
+  --rsm-austin: #d44e38; --rsm-brandon:#2a7ab0; --rsm-john:   #2a9060;
+  --asm-tim:    #ff6b6b; --asm-matt:   #ff9a3c; --asm-eddie:  #f5c518;
+  --asm-maggie: #26de81; --asm-bill:   #4c7ef3; --asm-al:     #b96ff5;
+  --asm-sam:    #f47abf; --asm-lindsay:#fd9f44; --asm-derek:  #38d9a9;
+  --asm-dave:   #a0d640; --asm-ryan:   #22d3ee; --asm-austin2:#e8735a;
+  --accent: #f0c040; --danger: #ff4d4d; --warn: #ff9a3c;
+}
+body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; overflow:hidden; }
+
+/* ── HEADER ── */
+.header { display:flex; align-items:center; justify-content:space-between; padding:12px 20px; border-bottom:1px solid var(--border); background:var(--bg2); gap:12px; flex-wrap:wrap; }
+.header-brand { display:flex; flex-direction:column; }
+.header-title { font-family:'Barlow Condensed',sans-serif; font-size:1.45rem; font-weight:800; letter-spacing:.04em; text-transform:uppercase; }
+.header-sub { font-size:.7rem; color:var(--text3); letter-spacing:.07em; text-transform:uppercase; }
+
+.layer-bar { display:flex; gap:5px; align-items:center; }
+.layer-label { font-size:.68rem; text-transform:uppercase; letter-spacing:.08em; color:var(--text3); font-weight:600; margin-right:4px; }
+
+.lbtn { font-family:'DM Sans',sans-serif; font-size:.73rem; font-weight:600; padding:5px 12px; border-radius:16px; border:1.5px solid var(--border2); background:transparent; color:var(--text2); cursor:pointer; transition:all .15s; display:flex; align-items:center; gap:5px; }
+.lbtn .dot { width:7px; height:7px; border-radius:50%; display:inline-block; }
+.lbtn:hover { border-color:var(--text2); color:var(--text); }
+.lbtn.active-isr  { background:rgba(232,115,90,.2);  border-color:var(--isr-alex);   color:#fff; }
+.lbtn.active-rsm  { background:rgba(42,122,176,.2);  border-color:var(--rsm-brandon);color:#fff; }
+.lbtn.active-asm  { background:rgba(75,126,243,.2);  border-color:var(--asm-bill);   color:#fff; }
+.lbtn.active-all  { background:rgba(255,255,255,.1); border-color:var(--text2);      color:#fff; }
+
+.view-sep { width:1px; height:22px; background:var(--border2); margin:0 6px; }
+
+.tbtn { font-family:'DM Sans',sans-serif; font-size:.71rem; padding:5px 11px; border-radius:16px; border:1.5px solid var(--border2); background:transparent; color:var(--text3); cursor:pointer; transition:all .15s; display:flex; align-items:center; gap:5px; }
+.tbtn.on { border-color:var(--accent); color:var(--accent); }
+.tbtn .tdot { width:6px; height:6px; border-radius:50%; background:currentColor; }
+
+
+
+/* ── LAYOUT ── */
+.main { display:grid; grid-template-columns:1fr 340px; height:calc(100vh - 91px); }
+
+/* ── MAP ── */
+.map-area { position:relative; background:var(--bg); overflow:hidden; cursor:grab; }
+.map-area:active { cursor:grabbing; }
+#map-svg { width:100%; height:100%; }
+
+.state-path { stroke:#0b1622; stroke-width:.8; cursor:pointer; transition:opacity .2s, stroke-width .15s; }
+.state-path:hover { stroke:rgba(255,255,255,.8); stroke-width:1.8; }
+.state-path.dimmed { opacity:.08; }
+.state-path.selected-state { stroke:#fff !important; stroke-width:2.5 !important; }
+.state-path.overlap-state { stroke:var(--accent) !important; stroke-width:2 !important; }
+
+.state-label { font-family:'Barlow Condensed',sans-serif; font-size:8.5px; font-weight:700; fill:rgba(255,255,255,.6); text-anchor:middle; dominant-baseline:middle; pointer-events:none; }
+
+.home-marker { cursor:pointer; }
+
+/* ── TOOLTIP ── */
+.tooltip { position:fixed; background:var(--bg3); border:1px solid var(--border2); border-radius:10px; padding:13px 15px; pointer-events:none; opacity:0; transition:opacity .12s; z-index:1000; min-width:220px; box-shadow:0 8px 36px rgba(0,0,0,.55); }
+.tooltip.visible { opacity:1; }
+.tt-state { font-family:'Barlow Condensed',sans-serif; font-size:1.15rem; font-weight:800; margin-bottom:10px; border-bottom:1px solid var(--border); padding-bottom:8px; }
+.tt-row { font-size:.71rem; color:var(--text2); display:flex; justify-content:space-between; gap:14px; margin-bottom:4px; line-height:1.4; }
+.tt-row span:last-child { color:var(--text); font-weight:500; text-align:right; max-width:60%; }
+.tt-new { font-size:.67rem; color:var(--accent); font-style:italic; margin-top:6px; }
+.tt-overlap { font-size:.67rem; color:var(--accent); font-weight:600; margin-top:5px; }
+.tt-divider { border:none; border-top:1px solid var(--border); margin:6px 0; }
+
+/* ── LEGEND ── */
+.legend { position:absolute; bottom:16px; left:16px; background:rgba(11,22,34,.9); border:1px solid var(--border); border-radius:9px; padding:11px 14px; backdrop-filter:blur(8px); pointer-events:none; max-width:200px; }
+.legend-title { font-size:.63rem; text-transform:uppercase; letter-spacing:.1em; color:var(--text3); margin-bottom:8px; font-weight:700; }
+.legend-item { display:flex; align-items:center; gap:7px; font-size:.72rem; margin-bottom:4px; color:var(--text2); }
+.legend-dot { width:9px; height:9px; border-radius:3px; flex-shrink:0; }
+.legend-sep { border:none; border-top:1px solid var(--border); margin:6px 0; }
+.legend-special { font-size:.67rem; display:flex; align-items:center; gap:6px; }
+
+/* ── SIDEBAR ── */
+.sidebar { background:var(--bg2); border-left:1px solid var(--border); overflow-y:auto; display:flex; flex-direction:column; }
+.sidebar::-webkit-scrollbar { width:3px; }
+.sidebar::-webkit-scrollbar-thumb { background:var(--border2); border-radius:3px; }
+
+.sb-section { padding:12px 14px; border-bottom:1px solid var(--border); }
+.sb-title { font-family:'Barlow Condensed',sans-serif; font-size:.78rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text3); margin-bottom:10px; display:flex; align-items:center; gap:6px; }
+.sb-title-badge { font-size:.63rem; background:var(--border); color:var(--text2); padding:1px 6px; border-radius:8px; font-family:'DM Sans',sans-serif; font-weight:500; }
+
+/* Selected state detail */
+.state-detail { background:var(--bg3); border-radius:var(--radius); padding:14px; border:1px solid var(--border2); }
+.sd-name { font-family:'Barlow Condensed',sans-serif; font-size:1.5rem; font-weight:800; margin-bottom:6px; }
+.sd-new { font-size:.65rem; font-weight:600; letter-spacing:.05em; color:var(--accent); background:rgba(240,192,64,.1); padding:2px 8px; border-radius:8px; border:1px solid rgba(240,192,64,.3); display:inline-block; margin-bottom:10px; }
+.sd-row { display:flex; justify-content:space-between; font-size:.72rem; color:var(--text3); margin-bottom:5px; padding-bottom:5px; border-bottom:1px solid var(--border); }
+.sd-row:last-child { border-bottom:none; margin-bottom:0; padding-bottom:0; }
+.sd-row span:last-child { color:var(--text); font-weight:500; text-align:right; max-width:58%; }
+.sd-placeholder { color:var(--text3); font-size:.77rem; font-style:italic; text-align:center; padding:16px 0; }
+
+/* Person list */
+.person-group { margin-bottom:6px; }
+.pg-label { font-size:.64rem; text-transform:uppercase; letter-spacing:.1em; color:var(--text3); font-weight:700; margin-bottom:5px; padding:3px 6px; background:var(--bg3); border-radius:4px; }
+
+.person-row { display:flex; align-items:center; gap:8px; padding:5px 6px; border-radius:6px; cursor:pointer; transition:background .12s; margin-bottom:2px; border:1px solid transparent; }
+.person-row:hover { background:var(--bg3); }
+.person-row.selected { background:var(--bg4); border-color:var(--border2); }
+.person-row.terminated { opacity:.4; text-decoration:line-through; cursor:default; pointer-events:none; }
+
+.pr-check { width:14px; height:14px; border-radius:3px; border:1.5px solid var(--border2); background:transparent; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; transition:all .12s; }
+.pr-check.checked { border-color:currentColor; background:currentColor; }
+.pr-check.checked::after { content:'✓'; color:#fff; font-size:9px; font-weight:800; line-height:1; }
+
+.pr-dot { width:10px; height:10px; border-radius:3px; flex-shrink:0; }
+.pr-name { font-size:.77rem; font-weight:500; flex:1; line-height:1.2; }
+.pr-name small { display:block; font-size:.65rem; color:var(--text3); font-weight:400; }
+.pr-states { font-size:.68rem; color:var(--text3); white-space:nowrap; }
+.pr-tag { font-size:.6rem; font-weight:600; padding:1px 5px; border-radius:5px; white-space:nowrap; }
+
+/* Summary stats */
+.summary-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; }
+.sg-card { background:var(--bg3); border-radius:6px; padding:8px 10px; border:1px solid var(--border); }
+.sg-num { font-family:'Barlow Condensed',sans-serif; font-size:1.2rem; font-weight:800; }
+.sg-label { font-size:.63rem; color:var(--text3); margin-top:1px; }
+
+/* Overlap mode bar */
+.overlap-bar { background:rgba(240,192,64,.07); border:1px solid rgba(240,192,64,.2); border-radius:var(--radius); padding:8px 10px; font-size:.72rem; margin-bottom:8px; }
+.ob-title { color:var(--accent); font-weight:600; margin-bottom:4px; }
+.ob-body { color:var(--text2); }
+.ob-states { color:var(--text); font-weight:500; }
+
+/* Note pill */
+.note-pill { font-size:.68rem; background:rgba(34,211,238,.08); border:1px solid rgba(34,211,238,.25); color:#22d3ee; border-radius:8px; padding:5px 10px; display:flex; gap:6px; align-items:flex-start; line-height:1.5; }
+.note-pill .np-icon { flex-shrink:0; font-size:.85rem; margin-top:1px; }
+
+/* Compare actions */
+.compare-actions { display:flex; gap:6px; flex-wrap:wrap; }
+.ca-btn { font-size:.68rem; padding:4px 10px; border-radius:12px; border:1.5px solid var(--border2); background:transparent; color:var(--text2); cursor:pointer; transition:all .13s; font-family:'DM Sans',sans-serif; font-weight:500; }
+.ca-btn:hover { border-color:var(--text); color:var(--text); }
+.ca-btn.active { background:var(--border2); color:#fff; }
+
+/* Map tooltip for markers */
+.mtip { position:fixed; background:var(--bg3); border:1px solid var(--border2); border-radius:7px; padding:7px 11px; pointer-events:none; opacity:0; transition:opacity .12s; z-index:1001; font-size:.73rem; box-shadow:0 4px 20px rgba(0,0,0,.45); white-space:nowrap; }
+.mtip.visible { opacity:1; }
+
+/* Map zoom hint */
+.zoom-hint { position:absolute; top:14px; right:14px; background:rgba(11,22,34,.8); border:1px solid var(--border); border-radius:20px; padding:4px 12px; font-size:.66rem; color:var(--text3); pointer-events:none; }
+
+/* CA note */
+.ca-note { position:absolute; top:14px; left:50%; transform:translateX(-50%); background:rgba(185,111,245,.1); border:1px solid rgba(185,111,245,.35); border-radius:20px; padding:4px 14px; font-size:.68rem; color:rgba(185,111,245,.9); pointer-events:none; white-space:nowrap; }
+</style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>📊 Morpheus8 Owner Density Analysis</h1>
-            <p style="color: #718096; margin-top: 10px;">Target market analysis for strategic planning</p>
-            
-            <div class="summary-cards">
-                <div class="card">
-                    <div class="card-label">Total Morpheus8 Owners</div>
-                    <div class="card-value">5,401</div>
-                </div>
-                <div class="card">
-                    <div class="card-label">Cities with 12+ Owners</div>
-                    <div class="card-value">69</div>
-                </div>
-                <div class="card">
-                    <div class="card-label">High-Density Zip Codes</div>
-                    <div class="card-value">174</div>
-                </div>
-                <div class="card">
-                    <div class="card-label">Top City</div>
-                    <div class="card-value" style="font-size: 1.5em;">NYC</div>
-                    <div class="card-label">146 owners</div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="content">
-            <div class="tabs">
-                <button class="tab active" onclick="switchTab('cities')">By City</button>
-                <button class="tab" onclick="switchTab('zipcodes')">By Zip Code</button>
-            </div>
-            
-            <div id="cities" class="tab-content active">
-                <input type="text" id="citySearch" class="search-box" placeholder="🔍 Search cities..." onkeyup="filterTable('cityTable', 'citySearch')">
-                
-                <div class="filter-buttons">
-                    <button class="filter-btn active" onclick="filterByCount('city', 0)">All Cities</button>
-                    <button class="filter-btn" onclick="filterByCount('city', 12)">12+ Owners</button>
-                    <button class="filter-btn" onclick="filterByCount('city', 20)">20+ Owners</button>
-                    <button class="filter-btn" onclick="filterByCount('city', 30)">30+ Owners</button>
-                </div>
-                
-                <table id="cityTable">
-                    <thead>
-                        <tr>
-                            <th onclick="sortTable('cityTable', 0, 'num')"># <span class="sort-indicator">▼</span></th>
-                            <th onclick="sortTable('cityTable', 1, 'str')">City</th>
-                            <th onclick="sortTable('cityTable', 2, 'str')">State</th>
-                            <th onclick="sortTable('cityTable', 3, 'num')">Owner Count</th>
-                        </tr>
-                    </thead>
-                    <tbody id="cityTableBody">
-                    </tbody>
-                </table>
-            </div>
-            
-            <div id="zipcodes" class="tab-content">
-                <input type="text" id="zipSearch" class="search-box" placeholder="🔍 Search zip codes..." onkeyup="filterTable('zipTable', 'zipSearch')">
-                
-                <div class="filter-buttons">
-                    <button class="filter-btn active" onclick="filterByCount('zip', 0)">All Zip Codes</button>
-                    <button class="filter-btn" onclick="filterByCount('zip', 5)">5+ Owners</button>
-                    <button class="filter-btn" onclick="filterByCount('zip', 10)">10+ Owners</button>
-                    <button class="filter-btn" onclick="filterByCount('zip', 15)">15+ Owners</button>
-                </div>
-                
-                <table id="zipTable">
-                    <thead>
-                        <tr>
-                            <th onclick="sortTable('zipTable', 0, 'num')"># <span class="sort-indicator">▼</span></th>
-                            <th onclick="sortTable('zipTable', 1, 'num')">Zip Code</th>
-                            <th onclick="sortTable('zipTable', 2, 'str')">City</th>
-                            <th onclick="sortTable('zipTable', 3, 'str')">State</th>
-                            <th onclick="sortTable('zipTable', 4, 'num')">Owner Count</th>
-                        </tr>
-                    </thead>
-                    <tbody id="zipTableBody">
-                    </tbody>
-                </table>
-            </div>
-        </div>
+
+<!-- ── HEADER ── -->
+<header class="header">
+  <div class="header-brand">
+    <div class="header-title">ISR Sales Territory Map</div>
+    <div class="header-sub">Team Alignment · All 50 States · Updated</div>
+  </div>
+  <div class="layer-bar">
+    <span class="layer-label">View By:</span>
+    <button class="lbtn active-isr" id="btn-isr" onclick="setLayer('isr')">
+      <span class="dot" style="background:var(--isr-alex)"></span>ISR
+    </button>
+    <button class="lbtn" id="btn-rsm" onclick="setLayer('rsm')">
+      <span class="dot" style="background:var(--rsm-brandon)"></span>RSM
+    </button>
+    <button class="lbtn" id="btn-asm" onclick="setLayer('asm')">
+      <span class="dot" style="background:var(--asm-bill)"></span>ASM
+    </button>
+    <div class="view-sep"></div>
+    <button class="tbtn on" id="btn-markers" onclick="toggleMarkers()"><span class="tdot"></span>Home Bases</button>
+    <button class="tbtn on" id="btn-new" onclick="toggleNew()"><span class="tdot"></span>★ New</button>
+    <button class="tbtn" id="btn-compare" onclick="toggleCompare()"><span class="tdot"></span>Compare Mode</button>
+  </div>
+</header>
+
+
+
+<!-- ── MAIN ── -->
+<div class="main">
+
+  <!-- MAP -->
+  <div class="map-area" id="map-area">
+    <svg id="map-svg"></svg>
+    <div class="tooltip" id="tooltip"></div>
+    <div class="mtip" id="mtip"></div>
+    <div class="legend" id="legend"></div>
+    <div class="zoom-hint">Scroll to zoom · Dbl-click to reset</div>
+    <div class="ca-note" id="ca-note" style="display:none">★ California: Bill Fanara (NorCal) + Al Cervantes (SoCal) — state-level map cannot show county split</div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+
+    <!-- Selected state detail -->
+    <div class="sb-section" id="state-detail-section">
+      <div class="sb-title">State Detail</div>
+      <div id="state-detail"><div class="sd-placeholder">Click any state for details</div></div>
     </div>
-    
-    <script>
-        // City data
-        const cityData = [
-            ["New York", "NY", 146],
-            ["Miami", "FL", 110],
-            ["Los Angeles", "CA", 72],
-            ["Beverly Hills", "CA", 71],
-            ["Houston", "TX", 57],
-            ["Chicago", "IL", 46],
-            ["Las Vegas", "NV", 41],
-            ["Austin", "TX", 39],
-            ["Atlanta", "GA", 39],
-            ["Scottsdale", "AZ", 38],
-            ["San Antonio", "TX", 37],
-            ["Dallas", "TX", 37],
-            ["Tampa", "FL", 36],
-            ["Denver", "CO", 31],
-            ["Boca Raton", "FL", 31],
-            ["San Diego", "CA", 28],
-            ["Newport Beach", "CA", 26],
-            ["Oklahoma City", "OK", 26],
-            ["Fort Lauderdale", "FL", 26],
-            ["Brooklyn", "NY", 26],
-            ["Orlando", "FL", 25],
-            ["Hollywood", "FL", 25],
-            ["Phoenix", "AZ", 25],
-            ["Plano", "TX", 24],
-            ["Tulsa", "OK", 21],
-            ["Charlotte", "NC", 21],
-            ["Glendale", "CA", 20],
-            ["Colorado Springs", "CO", 20],
-            ["Nashville", "TN", 20],
-            ["Hialeah", "FL", 20],
-            ["Pasadena", "CA", 19],
-            ["Seattle", "WA", 19],
-            ["Aventura", "FL", 19],
-            ["Santa Monica", "CA", 18],
-            ["Encino", "CA", 18],
-            ["San Jose", "CA", 18],
-            ["San Francisco", "CA", 18],
-            ["Torrance", "CA", 17],
-            ["Oklahoma", "OK", 17],
-            ["Carmel", "IN", 17],
-            ["West Palm Beach", "FL", 17],
-            ["Brentwood", "TN", 16],
-            ["Pembroke Pines", "FL", 16],
-            ["Sarasota", "FL", 16],
-            ["Portland", "OR", 16],
-            ["Irvine", "CA", 15],
-            ["Coral Gables", "FL", 15],
-            ["Lakewood", "CO", 15],
-            ["McLean", "VA", 14],
-            ["Tulsa", "OK", 14],
-            ["Frisco", "TX", 14],
-            ["Burbank", "CA", 14],
-            ["Memphis", "TN", 14],
-            ["West Hollywood", "CA", 13],
-            ["Buffalo", "NY", 13],
-            ["Fort Worth", "TX", 13],
-            ["Midland", "TX", 13],
-            ["Englewood", "CO", 13],
-            ["Mclean", "VA", 13],
-            ["McAllen", "TX", 12],
-            ["Birmingham", "AL", 12],
-            ["Westlake Village", "CA", 12],
-            ["Bellevue", "WA", 12],
-            ["Doral", "FL", 12],
-            ["Winter Park", "FL", 12],
-            ["Overland Park", "KS", 12],
-            ["Sunrise", "FL", 11],
-            ["Plantation", "FL", 11],
-            ["Clearwater", "FL", 11]
-        ];
-        
-        // Zip code data
-        const zipData = [
-            [90210, "Beverly Hills", "CA", 37],
-            [90211, "Beverly Hills", "CA", 21],
-            [92660, "Newport Beach", "CA", 20],
-            [10022, "New York", "NY", 18],
-            [10021, "New York", "NY", 17],
-            [10028, "New York", "NY", 15],
-            [60611, "Chicago", "IL", 15],
-            [46032, "Carmel", "IN", 14],
-            [10065, "New York", "NY", 14],
-            [75093, "Plano", "TX", 13],
-            [90212, "Beverly Hills", "CA", 13],
-            [37027, "Brentwood", "TN", 13],
-            [10019, "New York", "NY", 12],
-            [75034, "Frisco", "TX", 12],
-            [90069, "West Hollywood", "CA", 12],
-            [85260, "Scottsdale", "AZ", 11],
-            [33133, "Miami", "FL", 11],
-            [91361, "Westlake Village", "CA", 10],
-            [34239, "Sarasota", "FL", 10],
-            [89117, "Las Vegas", "NV", 10],
-            [33143, "Miami", "FL", 10],
-            [33134, "Miami", "FL", 10],
-            [33016, "Hialeah", "FL", 10],
-            [90505, "Torrance", "CA", 9],
-            [85254, "Scottsdale", "AZ", 9],
-            [14221, "Buffalo", "NY", 9],
-            [78504, "McAllen", "TX", 9],
-            [80111, "Englewood", "CO", 9],
-            [30305, "Atlanta", "GA", 9],
-            [32789, "Winter Park", "FL", 9],
-            [78759, "Austin", "TX", 8],
-            [33160, "North Miami Beach", "FL", 8],
-            [91356, "Tarzana", "CA", 8],
-            [91367, "Woodland Hills", "CA", 8],
-            [90024, "Los Angeles", "CA", 8],
-            [73120, "Oklahoma City", "OK", 8],
-            [90025, "Los Angeles", "CA", 8],
-            [78746, "Austin", "TX", 8],
-            [10023, "New York", "NY", 8],
-            [33179, "Miami", "FL", 8],
-            [60614, "Chicago", "IL", 7],
-            [91206, "Glendale", "CA", 7],
-            [78701, "Austin", "TX", 7],
-            [75205, "Dallas", "TX", 7],
-            [90024, "Los Angeles", "CA", 7],
-            [33126, "Miami", "FL", 7],
-            [22102, "McLean", "VA", 7],
-            [90048, "Los Angeles", "CA", 7],
-            [73134, "Oklahoma City", "OK", 7],
-            [90272, "Pacific Palisades", "CA", 7],
-            [89113, "Las Vegas", "NV", 7],
-            [60610, "Chicago", "IL", 7],
-            [77056, "Houston", "TX", 7],
-            [33180, "Aventura", "FL", 7],
-            [73132, "Oklahoma City", "OK", 7],
-            [33156, "Miami", "FL", 7],
-            [78731, "Austin", "TX", 6],
-            [74137, "Tulsa", "OK", 6],
-            [33021, "Hollywood", "FL", 6],
-            [85018, "Phoenix", "AZ", 6],
-            [91501, "Burbank", "CA", 6],
-            [11201, "Brooklyn", "NY", 6],
-            [90049, "Los Angeles", "CA", 6],
-            [77005, "Houston", "TX", 6],
-            [90401, "Santa Monica", "CA", 6],
-            [33324, "Plantation", "FL", 6],
-            [33020, "Hollywood", "FL", 6],
-            [33167, "Miami", "FL", 6],
-            [33146, "Coral Gables", "FL", 6]
-        ];
-        
-        function renderCityTable() {
-            const tbody = document.getElementById('cityTableBody');
-            tbody.innerHTML = '';
-            cityData.forEach((row, index) => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><span class="rank">${index + 1}</span></td>
-                    <td><strong>${row[0]}</strong></td>
-                    <td>${row[1]}</td>
-                    <td><span class="count-badge">${row[2]}</span></td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-        
-        function renderZipTable() {
-            const tbody = document.getElementById('zipTableBody');
-            tbody.innerHTML = '';
-            zipData.forEach((row, index) => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><span class="rank">${index + 1}</span></td>
-                    <td><strong>${row[0]}</strong></td>
-                    <td>${row[1]}</td>
-                    <td>${row[2]}</td>
-                    <td><span class="count-badge">${row[3]}</span></td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-        
-        function switchTab(tabName) {
-            // Hide all tabs
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-            
-            // Show selected tab
-            document.getElementById(tabName).classList.add('active');
-            event.target.classList.add('active');
-        }
-        
-        function filterTable(tableId, searchId) {
-            const input = document.getElementById(searchId);
-            const filter = input.value.toUpperCase();
-            const table = document.getElementById(tableId);
-            const tr = table.getElementsByTagName('tr');
-            
-            for (let i = 1; i < tr.length; i++) {
-                const row = tr[i];
-                const text = row.textContent || row.innerText;
-                if (text.toUpperCase().indexOf(filter) > -1) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            }
-        }
-        
-        function filterByCount(type, minCount) {
-            // Update active button
-            event.target.parentElement.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-            
-            if (type === 'city') {
-                const tbody = document.getElementById('cityTableBody');
-                const rows = tbody.getElementsByTagName('tr');
-                Array.from(rows).forEach(row => {
-                    const countText = row.cells[3].textContent;
-                    const count = parseInt(countText);
-                    row.style.display = count >= minCount ? '' : 'none';
-                });
-            } else {
-                const tbody = document.getElementById('zipTableBody');
-                const rows = tbody.getElementsByTagName('tr');
-                Array.from(rows).forEach(row => {
-                    const countText = row.cells[4].textContent;
-                    const count = parseInt(countText);
-                    row.style.display = count >= minCount ? '' : 'none';
-                });
-            }
-        }
-        
-        function sortTable(tableId, column, type) {
-            const table = document.getElementById(tableId);
-            const tbody = table.querySelector('tbody');
-            const rows = Array.from(tbody.querySelectorAll('tr'));
-            
-            const sorted = rows.sort((a, b) => {
-                let aVal = a.cells[column].textContent.trim();
-                let bVal = b.cells[column].textContent.trim();
-                
-                if (type === 'num') {
-                    aVal = parseInt(aVal) || 0;
-                    bVal = parseInt(bVal) || 0;
-                    return bVal - aVal;
-                } else {
-                    return aVal.localeCompare(bVal);
-                }
-            });
-            
-            tbody.innerHTML = '';
-            sorted.forEach(row => tbody.appendChild(row));
-        }
-        
-        // Initialize tables
-        renderCityTable();
-        renderZipTable();
-    </script>
+
+    <!-- Compare mode panel (hidden by default) -->
+    <div class="sb-section" id="compare-panel" style="display:none">
+      <div class="sb-title">Compare Mode <span class="sb-title-badge" id="compare-count">0 selected</span></div>
+      <div id="overlap-info" style="margin-bottom:8px;display:none"></div>
+      <div class="compare-actions">
+        <button class="ca-btn" onclick="clearComparisons()">Clear All</button>
+        <button class="ca-btn" onclick="selectAllISR()">All ISR</button>
+        <button class="ca-btn" onclick="selectAllRSM()">All RSM</button>
+        <button class="ca-btn" onclick="selectAllASM()">All ASM</button>
+      </div>
+    </div>
+
+    <!-- People directory -->
+    <div class="sb-section">
+      <div class="sb-title">People Directory <span class="sb-title-badge" id="dir-mode-label">click to highlight</span></div>
+
+      <!-- ISR Group -->
+      <div class="person-group">
+        <div class="pg-label">ISR · Inside Sales Reps</div>
+        <div id="isr-list"></div>
+      </div>
+
+      <!-- RSM Group -->
+      <div class="person-group">
+        <div class="pg-label">RSM · Regional Sales Managers</div>
+        <div id="rsm-list"></div>
+      </div>
+
+      <!-- ASM Group -->
+      <div class="person-group">
+        <div class="pg-label">ASM · Area Sales Managers</div>
+        <div id="asm-list"></div>
+      </div>
+    </div>
+
+    <!-- Territory summary -->
+    <div class="sb-section">
+      <div class="sb-title">Territory Populations</div>
+      <div id="pop-summary"></div>
+    </div>
+
+    <!-- Note -->
+    <div class="sb-section">
+      <div class="note-pill">
+        <span class="np-icon">📍</span>
+        <span><strong style="color:var(--text)">CA Territory Split:</strong> Bill Fanara covers Northern California (roughly north of LA metro). Al Cervantes covers Southern California (LA metro south to Mexican border) + Hawaii. Map colors CA as dual-coverage in ASM view.</span>
+      </div>
+    </div>
+    <div style="height:16px"></div>
+  </aside>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════════
+// DATA
+// ════════════════════════════════════════════════════════════════
+
+const fipsToAbbrev = {
+  "01":"AL","02":"AK","04":"AZ","05":"AR","06":"CA","08":"CO","09":"CT","10":"DE",
+  "12":"FL","13":"GA","15":"HI","16":"ID","17":"IL","18":"IN","19":"IA","20":"KS",
+  "21":"KY","22":"LA","23":"ME","24":"MD","25":"MA","26":"MI","27":"MN","28":"MS",
+  "29":"MO","30":"MT","31":"NE","32":"NV","33":"NH","34":"NJ","35":"NM","36":"NY",
+  "37":"NC","38":"ND","39":"OH","40":"OK","41":"OR","42":"PA","44":"RI","45":"SC",
+  "46":"SD","47":"TN","48":"TX","49":"UT","50":"VT","51":"VA","53":"WA","54":"WV",
+  "55":"WI","56":"WY"
+};
+
+// Person definitions
+const PEOPLE = {
+  // ISR
+  'Alex Kazan':    { type:'isr', color:'#e8735a', role:'ISR', region:'South',                 title:'Inside Sales Rep',    city:'Stuart, FL',          homeISR:'Alex Kazan' },
+  'Justin Wing':   { type:'isr', color:'#4b9dd4', role:'ISR', region:'Great Lakes/Plains',    title:'Inside Sales Rep',    city:'Portage, MI',          homeISR:'Justin Wing' },
+  'Rachel Killion':{ type:'isr', color:'#5dbf8e', role:'ISR', region:'Northeast/West',        title:'Inside Sales Rep',    city:'Phoenix, AZ',          homeISR:'Rachel Killion' },
+  // RSM
+  'Austin Anderson':{ type:'rsm', color:'#d44e38', role:'RSM', region:'South',               title:'Regional Sales Mgr',  city:'Dripping Springs, TX', homeISR:'Alex Kazan' },
+  'Brandon Grim':  { type:'rsm', color:'#2a7ab0', role:'RSM', region:'Great Lakes/Plains',   title:'Regional Sales Mgr',  city:'Hilliard, OH',         homeISR:'Justin Wing' },
+  'John Hicks':    { type:'rsm', color:'#2a9060', role:'RSM', region:'Northeast/West',       title:'Regional Sales Mgr',  city:'New York, NY',         homeISR:'Rachel Killion' },
+  // ASM
+  'Tim Flood':     { type:'asm', color:'#ff6b6b', role:'ASM', region:'South',               title:'Area Sales Mgr',      city:'Charlotte, NC',        homeISR:'Alex Kazan' },
+  'Matt Calabrese':{ type:'asm', color:'#ff9a3c', role:'ASM', region:'South',               title:'Area Sales Mgr',      city:'Orlando, FL',          homeISR:'Alex Kazan' },
+  'Eddie Burnett': { type:'asm', color:'#f5c518', role:'ASM', region:'South',               title:'Area Sales Mgr',      city:'Missouri City, TX',    homeISR:'Alex Kazan' },
+  'Maggie Leis':   { type:'asm', color:'#26de81', role:'ASM', region:'Great Lakes/Plains',  title:'Area Sales Mgr',      city:'Columbus, OH',         homeISR:'Justin Wing' },
+  'Bill Fanara':   { type:'asm', color:'#4c7ef3', role:'ASM', region:'Great Lakes/Plains',  title:'Area Sales Mgr',      city:'Aptos, CA',            homeISR:'Justin Wing', note:'Expanded: absorbed Kris Latimer territory (AK,ID,OR,WA)' },
+  'Al Cervantes':  { type:'asm', color:'#b96ff5', role:'ASM', region:'Great Lakes/Plains',  title:'Area Sales Mgr',      city:'Tustin, CA',           homeISR:'Justin Wing', note:'SoCal (LA→Mexico border) + Hawaii' },
+  'Sam Girgenti':  { type:'asm', color:'#f47abf', role:'ASM', region:'Northeast/West',      title:'Area Sales Mgr',      city:'Melville, NY',         homeISR:'Rachel Killion' },
+  'Lindsay Hydorn':{ type:'asm', color:'#fd9f44', role:'ASM', region:'Northeast/West',      title:'Area Sales Mgr',      city:'New York, NY',         homeISR:'Rachel Killion' },
+  'Derek Bushey':  { type:'asm', color:'#38d9a9', role:'ASM', region:'Northeast/West',      title:'Area Sales Mgr',      city:'Scottsdale, AZ',       homeISR:'Rachel Killion', note:'Reduced: SoCal transferred to Al Cervantes' },
+  'Dave Carlin':   { type:'asm', color:'#a0d640', role:'ASM', region:'Northeast/West',      title:'Area Sales Mgr',      city:'West Jordan, UT',      homeISR:'Rachel Killion' },
+
+  // Terminated
+  'Kris Latimer':  { type:'asm', color:'#666', role:'ASM', region:'Pacific NW', title:'TERMINATED', terminated:true, homeISR:'Justin Wing' },
+  'Vince Murdocco':{ type:'asm', color:'#666', role:'ASM', region:'Great Lakes', title:'TERMINATED', terminated:true, homeISR:'Justin Wing' },
+};
+
+// ISR covers same geographic states as RSM for that region
+// State → who covers at each level
+const stateData = {
+  AL:{ name:'Alabama',        isr:'Alex Kazan',    rsm:'Austin Anderson', asm:['Austin Anderson'],        pop:5108468,  isNew:false },
+  AK:{ name:'Alaska',         isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Bill Fanara'],             pop:733583,   isNew:true,  changeNote:'Was Kris Latimer → Bill Fanara' },
+  AZ:{ name:'Arizona',        isr:'Rachel Killion',rsm:'John Hicks',     asm:['Derek Bushey'],            pop:7431344,  isNew:false },
+  AR:{ name:'Arkansas',       isr:'Alex Kazan',    rsm:'Austin Anderson', asm:['Eddie Burnett'],           pop:3067732,  isNew:true },
+  CA:{ name:'California',     isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Bill Fanara','Al Cervantes'],pop:38965193, isNew:false, dualCA:true },
+  CO:{ name:'Colorado',       isr:'Rachel Killion',rsm:'John Hicks',     asm:['Dave Carlin'],             pop:5877610,  isNew:false },
+  CT:{ name:'Connecticut',    isr:'Rachel Killion',rsm:'John Hicks',     asm:['Lindsay Hydorn'],          pop:3617176,  isNew:false },
+  DE:{ name:'Delaware',       isr:'Rachel Killion',rsm:'John Hicks',     asm:['Lindsay Hydorn'],          pop:1031890,  isNew:true },
+  FL:{ name:'Florida',        isr:'Alex Kazan',    rsm:'Austin Anderson', asm:['Matt Calabrese'],          pop:22610726, isNew:false },
+  GA:{ name:'Georgia',        isr:'Alex Kazan',    rsm:'Austin Anderson', asm:['Tim Flood'],               pop:11029227, isNew:false },
+  HI:{ name:'Hawaii',         isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Al Cervantes'],            pop:1435138,  isNew:false },
+  ID:{ name:'Idaho',          isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Bill Fanara'],             pop:1964726,  isNew:true,  changeNote:'Was Kris Latimer → Bill Fanara' },
+  IL:{ name:'Illinois',       isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Brandon Grim'],            pop:12549689, isNew:false, changeNote:'Was Vince Murdocco → Brandon Grim' },
+  IN:{ name:'Indiana',        isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Maggie Leis'],             pop:6862199,  isNew:false },
+  IA:{ name:'Iowa',           isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Maggie Leis'],             pop:3207004,  isNew:false },
+  KS:{ name:'Kansas',         isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Brandon Grim'],            pop:2940865,  isNew:false, changeNote:'Was Vince Murdocco → Brandon Grim' },
+  KY:{ name:'Kentucky',       isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Maggie Leis'],             pop:4526154,  isNew:false },
+  LA:{ name:'Louisiana',      isr:'Alex Kazan',    rsm:'Austin Anderson', asm:['Austin Anderson'],         pop:4573749,  isNew:false },
+  ME:{ name:'Maine',          isr:'Rachel Killion',rsm:'John Hicks',     asm:['Lindsay Hydorn'],          pop:1395722,  isNew:true },
+  MD:{ name:'Maryland',       isr:'Rachel Killion',rsm:'John Hicks',     asm:['Lindsay Hydorn'],          pop:6180253,  isNew:true },
+  MA:{ name:'Massachusetts',  isr:'Rachel Killion',rsm:'John Hicks',     asm:['Lindsay Hydorn','Sam Girgenti'],pop:7001399, isNew:true },
+  MI:{ name:'Michigan',       isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Brandon Grim'],            pop:10037261, isNew:false },
+  MN:{ name:'Minnesota',      isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Brandon Grim'],            pop:5737915,  isNew:false, changeNote:'Was Vince Murdocco → Brandon Grim' },
+  MS:{ name:'Mississippi',    isr:'Alex Kazan',    rsm:'Austin Anderson', asm:['Austin Anderson'],         pop:2939690,  isNew:true },
+  MO:{ name:'Missouri',       isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Maggie Leis'],             pop:6196156,  isNew:true },
+  MT:{ name:'Montana',        isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Brandon Grim'],            pop:1132812,  isNew:true,  changeNote:'Was Vince Murdocco → Brandon Grim' },
+  NE:{ name:'Nebraska',       isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Brandon Grim'],            pop:2001876,  isNew:true,  changeNote:'Was Vince Murdocco → Brandon Grim' },
+  NV:{ name:'Nevada',         isr:'Rachel Killion',rsm:'John Hicks',     asm:['Derek Bushey'],            pop:3267188,  isNew:false },
+  NH:{ name:'New Hampshire',  isr:'Rachel Killion',rsm:'John Hicks',     asm:['Lindsay Hydorn'],          pop:1402054,  isNew:true },
+  NJ:{ name:'New Jersey',     isr:'Rachel Killion',rsm:'John Hicks',     asm:['Lindsay Hydorn','Sam Girgenti'],pop:9290841, isNew:false },
+  NM:{ name:'New Mexico',     isr:'Rachel Killion',rsm:'John Hicks',     asm:['Derek Bushey'],            pop:2114371,  isNew:true },
+  NY:{ name:'New York',       isr:'Rachel Killion',rsm:'John Hicks',     asm:['Lindsay Hydorn','Sam Girgenti'],pop:19571216, isNew:false },
+  NC:{ name:'North Carolina', isr:'Alex Kazan',    rsm:'Austin Anderson', asm:['Tim Flood'],               pop:10835491, isNew:false },
+  ND:{ name:'North Dakota',   isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Brandon Grim'],            pop:783926,   isNew:false, changeNote:'Was Vince Murdocco → Brandon Grim' },
+  OH:{ name:'Ohio',           isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Maggie Leis'],             pop:11785935, isNew:false },
+  OK:{ name:'Oklahoma',       isr:'Alex Kazan',    rsm:'Austin Anderson', asm:['Austin Anderson'],         pop:4053824,  isNew:false },
+  OR:{ name:'Oregon',         isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Bill Fanara'],             pop:4233358,  isNew:true,  changeNote:'Was Kris Latimer → Bill Fanara' },
+  PA:{ name:'Pennsylvania',   isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Brandon Grim'],            pop:12961683, isNew:false },
+  RI:{ name:'Rhode Island',   isr:'Rachel Killion',rsm:'John Hicks',     asm:['Lindsay Hydorn','Sam Girgenti'],pop:1095610, isNew:true },
+  SC:{ name:'South Carolina', isr:'Alex Kazan',    rsm:'Austin Anderson', asm:['Tim Flood'],               pop:5373555,  isNew:false },
+  SD:{ name:'South Dakota',   isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Brandon Grim'],            pop:919318,   isNew:false, changeNote:'Was Vince Murdocco → Brandon Grim' },
+  TN:{ name:'Tennessee',      isr:'Alex Kazan',    rsm:'Austin Anderson', asm:['Tim Flood'],               pop:7126489,  isNew:true },
+  TX:{ name:'Texas',          isr:'Alex Kazan',    rsm:'Austin Anderson', asm:['Austin Anderson','Eddie Burnett'],pop:30503301, isNew:false },
+  UT:{ name:'Utah',           isr:'Rachel Killion',rsm:'John Hicks',     asm:['Dave Carlin'],             pop:3417734,  isNew:false },
+  VT:{ name:'Vermont',        isr:'Rachel Killion',rsm:'John Hicks',     asm:['Lindsay Hydorn'],          pop:647464,   isNew:true },
+  VA:{ name:'Virginia',       isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Brandon Grim'],            pop:8715698,  isNew:false, changeNote:'Was Vince Murdocco → Brandon Grim' },
+  WA:{ name:'Washington',     isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Bill Fanara'],             pop:7812880,  isNew:true,  changeNote:'Was Kris Latimer → Bill Fanara' },
+  WV:{ name:'West Virginia',  isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Brandon Grim'],            pop:1770071,  isNew:false },
+  WI:{ name:'Wisconsin',      isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Brandon Grim'],            pop:5892539,  isNew:false, changeNote:'Was Vince Murdocco → Brandon Grim' },
+  WY:{ name:'Wyoming',        isr:'Rachel Killion',rsm:'John Hicks',     asm:['Dave Carlin'],             pop:584057,   isNew:false },
+};
+
+// Home base markers
+const homeMarkers = [
+  {name:'Alex Kazan',    lat:27.197, lng:-80.253, type:'isr'},
+  {name:'Justin Wing',   lat:42.201, lng:-85.580, type:'isr'},
+  {name:'Rachel Killion',lat:33.616, lng:-112.022,type:'isr'},
+  {name:'Austin Anderson',lat:30.190,lng:-98.087, type:'rsm'},
+  {name:'Brandon Grim',  lat:40.033, lng:-83.158, type:'rsm'},
+  {name:'John Hicks',    lat:40.729, lng:-73.997, type:'rsm'},
+  {name:'Tim Flood',     lat:35.196, lng:-80.793, type:'asm'},
+  {name:'Matt Calabrese',lat:28.553, lng:-81.373, type:'asm'},
+  {name:'Eddie Burnett', lat:29.619, lng:-95.538, type:'asm'},
+  {name:'Maggie Leis',   lat:40.001, lng:-83.023, type:'asm'},
+  {name:'Sam Girgenti',  lat:40.797, lng:-73.413, type:'asm'},
+  {name:'Lindsay Hydorn',lat:40.750, lng:-73.970, type:'asm'},
+  {name:'Derek Bushey',  lat:33.619, lng:-111.898,type:'asm'},
+  {name:'Dave Carlin',   lat:40.610, lng:-111.939,type:'asm'},
+  {name:'Bill Fanara',   lat:36.977, lng:-121.891,type:'asm'},
+  {name:'Al Cervantes',  lat:33.746, lng:-117.826,type:'asm'},
+
+];
+
+// ════════════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════════════
+let currentLayer   = 'isr';
+let selectedState  = null;
+let showMarkers    = true;
+let showNew        = true;
+let compareMode    = false;
+let selectedPeople = new Set();  // for compare mode / highlight
+let highlightPerson = null;      // single highlight (non-compare)
+
+// ════════════════════════════════════════════════════════════════
+// UTILITIES
+// ════════════════════════════════════════════════════════════════
+function fmtPop(n){ if(n>=1e6)return(n/1e6).toFixed(1)+'M'; if(n>=1e3)return(n/1e3).toFixed(0)+'K'; return n+''; }
+function fmtPopFull(n){ return n.toLocaleString(); }
+function getAbbrev(id){ const s=String(id).padStart(2,'0'); return fipsToAbbrev[s]; }
+
+function getStateColor(abbrev){
+  const sd = stateData[abbrev];
+  if(!sd) return '#222';
+  if(currentLayer==='isr') return PEOPLE[sd.isr]?.color || '#444';
+  if(currentLayer==='rsm') return PEOPLE[sd.rsm]?.color || '#444';
+  if(currentLayer==='asm'){
+    if(sd.asm.length===1) return PEOPLE[sd.asm[0]]?.color || '#444';
+    return null; // will use pattern
+  }
+  return '#444';
+}
+
+function primaryASMForState(abbrev){
+  const sd=stateData[abbrev]; if(!sd) return null;
+  return sd.asm[0];
+}
+
+// ════════════════════════════════════════════════════════════════
+// SIDEBAR: People directory
+// ════════════════════════════════════════════════════════════════
+function buildDirectory(){
+  const isrList  = document.getElementById('isr-list');
+  const rsmList  = document.getElementById('rsm-list');
+  const asmList  = document.getElementById('asm-list');
+
+  // Count states per person
+  const stateCounts = {};
+  Object.entries(stateData).forEach(([abbrev,sd])=>{
+    const people = [sd.isr, sd.rsm, ...sd.asm];
+    people.forEach(p=>{ stateCounts[p]=(stateCounts[p]||0)+1; });
+  });
+
+  const buildRow = (name) => {
+    const p = PEOPLE[name];
+    if(!p) return;
+    const el = document.createElement('div');
+    el.className = 'person-row' + (p.terminated?' terminated':'') + (p.pending?' pending-row':'');
+    el.id = 'prow-'+name.replace(/\s/g,'_').replace(/[()]/g,'');
+    const cnt = stateCounts[name] || 0;
+
+    let tagHtml = '';
+    if(p.terminated) tagHtml = `<span class="pr-tag" style="background:rgba(255,77,77,.12);color:#ff4d4d">Terminated</span>`;
+    else if(p.pending) tagHtml = `<span class="pr-tag" style="background:rgba(34,211,238,.12);color:#22d3ee">Pending</span>`;
+    else if(p.note) tagHtml = `<span class="pr-tag" style="background:rgba(240,192,64,.12);color:var(--accent)">Updated</span>`;
+
+    el.innerHTML = `
+      <div class="pr-check" id="chk-${name.replace(/\s/g,'_').replace(/[()]/g,'')}" style="color:${p.color}"></div>
+      <div class="pr-dot" style="background:${p.color};${p.terminated?'opacity:.4':''}"></div>
+      <div class="pr-name">${name}${p.note?`<small style="color:#7a9ab5">${p.note}</small>`:''}${tagHtml}</div>
+      <div class="pr-states">${p.terminated?'—':cnt+' states'}</div>
+    `;
+    if(!p.terminated){
+      el.addEventListener('click', ()=>onPersonClick(name));
+    }
+    return el;
+  };
+
+  ['Alex Kazan','Justin Wing','Rachel Killion'].forEach(n=>{ const r=buildRow(n); if(r) isrList.appendChild(r); });
+  ['Austin Anderson','Brandon Grim','John Hicks'].forEach(n=>{ const r=buildRow(n); if(r) rsmList.appendChild(r); });
+  ['Tim Flood','Matt Calabrese','Eddie Burnett','Maggie Leis','Bill Fanara','Al Cervantes','Sam Girgenti','Lindsay Hydorn','Derek Bushey','Dave Carlin','Kris Latimer','Vince Murdocco']
+    .forEach(n=>{ const r=buildRow(n); if(r) asmList.appendChild(r); });
+}
+
+function onPersonClick(name){
+  if(compareMode){
+    // Toggle in compare set
+    if(selectedPeople.has(name)) selectedPeople.delete(name);
+    else selectedPeople.add(name);
+    updateCompareUI();
+  } else {
+    // Single highlight toggle
+    if(highlightPerson===name){ highlightPerson=null; }
+    else { highlightPerson=name; }
+    updateHighlight();
+  }
+  updatePersonRowUI();
+}
+
+function updatePersonRowUI(){
+  Object.keys(PEOPLE).forEach(name=>{
+    const id = 'prow-'+name.replace(/\s/g,'_').replace(/[()]/g,'');
+    const el = document.getElementById(id);
+    if(!el) return;
+    const chkId = 'chk-'+name.replace(/\s/g,'_').replace(/[()]/g,'');
+    const chk = document.getElementById(chkId);
+    if(compareMode){
+      el.classList.toggle('selected', selectedPeople.has(name));
+      if(chk){ chk.classList.toggle('checked', selectedPeople.has(name)); }
+    } else {
+      el.classList.toggle('selected', highlightPerson===name);
+      if(chk){ chk.classList.toggle('checked', highlightPerson===name); }
+    }
+  });
+}
+
+// ════════════════════════════════════════════════════════════════
+// TERRITORY SUMMARY
+// ════════════════════════════════════════════════════════════════
+function buildPopSummary(){
+  const el = document.getElementById('pop-summary');
+  const isr = { 'Alex Kazan':{pop:0,cnt:0},'Justin Wing':{pop:0,cnt:0},'Rachel Killion':{pop:0,cnt:0} };
+  Object.values(stateData).forEach(sd=>{
+    if(isr[sd.isr]){ isr[sd.isr].pop+=sd.pop; isr[sd.isr].cnt++; }
+  });
+  const total = Object.values(isr).reduce((a,b)=>a+b.pop,0);
+  el.innerHTML = Object.entries(isr).map(([name,d])=>{
+    const p=PEOPLE[name]; const pct=(d.pop/total*100).toFixed(0);
+    return `<div style="margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;font-size:.73rem;margin-bottom:3px">
+        <span style="color:${p.color};font-weight:600">${name}</span>
+        <span style="color:var(--text2)">${fmtPop(d.pop)} · ${d.cnt} states</span>
+      </div>
+      <div style="height:4px;background:var(--border);border-radius:4px;overflow:hidden">
+        <div style="height:100%;width:${pct}%;background:${p.color};border-radius:4px"></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════════════════════════════
+// LEGEND
+// ════════════════════════════════════════════════════════════════
+function buildLegend(){
+  const el = document.getElementById('legend');
+  let items = [];
+  if(currentLayer==='isr'){
+    items = [
+      { color:'#e8735a', label:'Alex Kazan · South' },
+      { color:'#4b9dd4', label:'Justin Wing · Great Lakes/Plains' },
+      { color:'#5dbf8e', label:'Rachel Killion · NE/West' },
+    ];
+  } else if(currentLayer==='rsm'){
+    items = [
+      { color:'#d44e38', label:'Austin Anderson · South' },
+      { color:'#2a7ab0', label:'Brandon Grim · Great Lakes/Plains' },
+      { color:'#2a9060', label:'John Hicks · NE/West' },
+    ];
+  } else {
+    // ASM - just show a few key ones
+    items = [
+      { color:'#ff6b6b',  label:'Tim Flood' },
+      { color:'#ff9a3c',  label:'Matt Calabrese' },
+      { color:'#f5c518',  label:'Eddie Burnett' },
+      { color:'#26de81',  label:'Maggie Leis' },
+      { color:'#4c7ef3',  label:'Bill Fanara (expanded)' },
+      { color:'#b96ff5',  label:'Al Cervantes (SoCal+HI)' },
+      { color:'#38d9a9',  label:'Derek Bushey (reduced)' },
+      { color:'#fd9f44',  label:'Lindsay Hydorn' },
+      { color:'#f47abf',  label:'Sam Girgenti' },
+      { color:'#a0d640',  label:'Dave Carlin' },
+      { color:'#2a7ab0',  label:'Brandon Grim (expanded)' },
+    ];
+  }
+  el.innerHTML = `<div class="legend-title">Layer: ${currentLayer.toUpperCase()}</div>
+    ${items.map(i=>`<div class="legend-item"><div class="legend-dot" style="background:${i.color}"></div>${i.label}</div>`).join('')}
+    <div class="legend-sep"></div>
+    <div class="legend-special">★ <span style="color:var(--accent);font-size:.69rem">Newly assigned state</span></div>
+    <div class="legend-special" style="margin-top:3px">▧ <span style="color:var(--text3);font-size:.69rem">Dual ASM coverage</span></div>`;
+}
+
+// ════════════════════════════════════════════════════════════════
+// D3 MAP
+// ════════════════════════════════════════════════════════════════
+const svg = d3.select('#map-svg');
+const mapArea = document.getElementById('map-area');
+
+const projection = d3.geoAlbersUsa().scale(1).translate([0,0]);
+const path = d3.geoPath().projection(projection);
+
+const g         = svg.append('g').attr('class','root-g');
+const statesG   = g.append('g').attr('class','states');
+const patternsG = svg.append('defs');
+const meshG     = g.append('g').attr('class','mesh').style('pointer-events','none');
+const labelsG   = g.append('g').attr('class','labels').style('pointer-events','none');
+const newG      = g.append('g').attr('class','new-badges').style('pointer-events','none');
+const markersG  = g.append('g').attr('class','markers');
+
+const tooltip = document.getElementById('tooltip');
+const mtip    = document.getElementById('mtip');
+
+// Create stripe patterns for dual-ASM states
+function buildPattern(id, c1, c2){
+  const pat = patternsG.append('pattern')
+    .attr('id', id).attr('patternUnits','userSpaceOnUse')
+    .attr('width',8).attr('height',8)
+    .attr('patternTransform','rotate(45)');
+  pat.append('rect').attr('width',8).attr('height',8).attr('fill',c1);
+  pat.append('rect').attr('x',0).attr('y',0).attr('width',4).attr('height',8).attr('fill',c2);
+}
+
+// Pre-build patterns for dual-coverage states
+buildPattern('pat-CA',   PEOPLE['Bill Fanara'].color,  PEOPLE['Al Cervantes'].color);
+buildPattern('pat-NY',   PEOPLE['Lindsay Hydorn'].color,PEOPLE['Sam Girgenti'].color);
+buildPattern('pat-NJ',   PEOPLE['Lindsay Hydorn'].color,PEOPLE['Sam Girgenti'].color);
+buildPattern('pat-MA',   PEOPLE['Lindsay Hydorn'].color,PEOPLE['Sam Girgenti'].color);
+buildPattern('pat-RI',   PEOPLE['Lindsay Hydorn'].color,PEOPLE['Sam Girgenti'].color);
+buildPattern('pat-TX',   PEOPLE['Austin Anderson'].color,PEOPLE['Eddie Burnett'].color);
+buildPattern('pat-overlap', '#f0c040','#222');
+
+const zoom = d3.zoom().scaleExtent([0.7,10]).on('zoom', e=>{ g.attr('transform',e.transform); });
+svg.call(zoom);
+
+function fitMap(geo){
+  const w=mapArea.clientWidth, h=mapArea.clientHeight;
+  projection.scale(1).translate([0,0]);
+  const b=path.bounds(geo);
+  const s=0.93/Math.max((b[1][0]-b[0][0])/w,(b[1][1]-b[0][1])/h);
+  const t=[(w-s*(b[1][0]+b[0][0]))/2,(h-s*(b[1][1]+b[0][1]))/2];
+  projection.scale(s).translate(t);
+}
+
+d3.json('https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json').then(us=>{
+  const features = topojson.feature(us, us.objects.states).features;
+  const usGeo    = topojson.feature(us, us.objects.states);
+  fitMap(usGeo);
+
+  statesG.selectAll('.state-path')
+    .data(features).join('path')
+    .attr('class','state-path')
+    .attr('d', path)
+    .on('mousemove', onStateHover)
+    .on('mouseleave', ()=>tooltip.classList.remove('visible'))
+    .on('click', onStateClick);
+
+  meshG.append('path')
+    .datum(topojson.mesh(us,us.objects.states,(a,b)=>a!==b))
+    .attr('fill','none').attr('stroke','rgba(11,22,34,.7)').attr('stroke-width',.7).attr('d',path);
+
+  labelsG.selectAll('.state-label')
+    .data(features).join('text').attr('class','state-label')
+    .attr('x',d=>{ const c=path.centroid(d); return isNaN(c[0])?0:c[0]; })
+    .attr('y',d=>{ const c=path.centroid(d); return isNaN(c[1])?0:c[1]; })
+    .text(d=>getAbbrev(d.id)||'');
+
+  newG.selectAll('.nb')
+    .data(features.filter(d=>{ const a=getAbbrev(d.id); return stateData[a]?.isNew; }))
+    .join('text').attr('class','nb')
+    .attr('x',d=>{ const c=path.centroid(d); return isNaN(c[0])?0:c[0]+5; })
+    .attr('y',d=>{ const c=path.centroid(d); return isNaN(c[1])?0:c[1]-5; })
+    .attr('font-size',8).attr('fill','var(--accent)').attr('text-anchor','middle')
+    .attr('pointer-events','none').text('★');
+
+  colorStates();
+  drawMarkers();
+  buildLegend();
+}).catch(e=>console.error('Map error',e));
+
+// ── Color states ──
+function colorStates(){
+  statesG.selectAll('.state-path').attr('fill',d=>{
+    const abbrev = getAbbrev(d.id);
+    if(!abbrev) return '#222';
+    const sd = stateData[abbrev];
+    if(!sd) return '#222';
+
+    // Compare mode: highlight selected people's states
+    if(compareMode && selectedPeople.size>0){
+      const covered = getCoveredBy(abbrev);
+      const hits = [...selectedPeople].filter(p=>covered.includes(p));
+      if(hits.length===0) return '#222';
+      if(hits.length===1) return PEOPLE[hits[0]]?.color||'#444';
+      return `url(#pat-overlap)`;
+    }
+
+    // Single highlight
+    if(highlightPerson){
+      const covered = getCoveredBy(abbrev);
+      if(!covered.includes(highlightPerson)) return '#222';
+    }
+
+    if(currentLayer==='asm'){
+      const dual = getDualPattern(abbrev);
+      if(dual) return `url(#${dual})`;
+    }
+    return getStateColor(abbrev)||'#444';
+  }).attr('opacity',d=>{
+    const abbrev=getAbbrev(d.id);
+    if(compareMode && selectedPeople.size>0){
+      const covered=getCoveredBy(abbrev);
+      const hits=[...selectedPeople].filter(p=>covered.includes(p));
+      return hits.length>0?0.9:0.06;
+    }
+    if(highlightPerson){
+      const covered=getCoveredBy(abbrev);
+      return covered.includes(highlightPerson)?0.9:0.07;
+    }
+    return 0.85;
+  });
+}
+
+function getDualPattern(abbrev){
+  const patMap = {CA:'pat-CA',NY:'pat-NY',NJ:'pat-NJ',MA:'pat-MA',RI:'pat-RI',TX:'pat-TX'};
+  const sd=stateData[abbrev];
+  if(!sd||sd.asm.length<2) return null;
+  return patMap[abbrev]||null;
+}
+
+function getCoveredBy(abbrev){
+  const sd=stateData[abbrev]; if(!sd) return [];
+  return [sd.isr, sd.rsm, ...sd.asm];
+}
+
+// ── Markers ──
+function drawMarkers(){
+  markersG.selectAll('.hm').remove();
+  if(!showMarkers) return;
+
+  homeMarkers.forEach(m=>{
+    const xy=projection([m.lng,m.lat]);
+    if(!xy||isNaN(xy[0])) return;
+    const p=PEOPLE[m.name];
+    if(!p||p.terminated) return;
+    const color=p.color||'#888';
+    const sz = m.type==='isr'?8:m.type==='rsm'?6:4;
+
+    const g2=markersG.append('g').attr('class','hm home-marker')
+      .attr('transform',`translate(${xy[0]},${xy[1]})`);
+
+    if(m.type==='isr'||m.type==='rsm'){
+      g2.append('circle').attr('r',sz+3.5).attr('fill','none').attr('stroke',color).attr('stroke-width',1.8).attr('opacity',.5);
+    }
+    g2.append('circle').attr('r',sz).attr('fill',color).attr('stroke','#0b1622').attr('stroke-width',1.5)
+      .attr('opacity', m.pending?0.7:1);
+
+    if(m.pending){
+      g2.append('text').attr('y',0).attr('text-anchor','middle').attr('dominant-baseline','middle')
+        .attr('fill','#0b1622').attr('font-size',7).attr('font-weight','bold').text('?');
+    }
+
+    g2.on('mousemove', ev=>{
+      mtip.innerHTML=`<div class="mt-name">${m.name}</div><div class="mt-detail">${p.title}${p.region?` · ${p.region}`:''}</div><div class="mt-detail" style="color:var(--text2)">${p.city||''}${m.pending?' ⚠️ Pending':''}</div>`;
+      mtip.classList.add('visible');
+      posTip(mtip,ev);
+    }).on('mouseleave',()=>mtip.classList.remove('visible'));
+  });
+}
+
+// ── Tooltip ──
+function onStateHover(event, d){
+  const abbrev=getAbbrev(d.id), sd=stateData[abbrev];
+  if(!sd) return;
+  const col = PEOPLE[sd.isr]?.color||'#fff';
+  const asmList=sd.asm.map(a=>`<span style="color:${PEOPLE[a]?.color||'#fff'};font-weight:600">${a}</span>`).join(', ');
+  const overlap = compareMode && selectedPeople.size>1 ? getCoveredBy(abbrev).filter(p=>selectedPeople.has(p)) : [];
+
+  tooltip.innerHTML=`
+    <div class="tt-state" style="color:${col}">${sd.name} <span style="font-size:.72rem;color:var(--text3)">${abbrev}</span></div>
+    <div class="tt-row"><span>ISR</span><span style="color:${PEOPLE[sd.isr]?.color}">${sd.isr}</span></div>
+    <div class="tt-row"><span>RSM</span><span style="color:${PEOPLE[sd.rsm]?.color||'#fff'}">${sd.rsm}</span></div>
+    <div class="tt-row"><span>ASM(s)</span><span>${asmList}</span></div>
+    <hr class="tt-divider">
+    <div class="tt-row"><span>Population (2023)</span><span>${fmtPopFull(sd.pop)}</span></div>
+    ${sd.isNew?`<div class="tt-new">★ Newly assigned (was blank)</div>`:''}
+    ${sd.changeNote?`<div class="tt-new">↻ ${sd.changeNote}</div>`:''}
+    ${sd.pending?`<div class="tt-new" style="color:#22d3ee">⚠️ Pending: ${sd.changeNote||''}</div>`:''}
+    ${overlap.length>1?`<div class="tt-overlap">⚡ Overlap: ${overlap.join(' + ')}</div>`:''}
+  `;
+  tooltip.classList.add('visible');
+  posTip(tooltip,event);
+}
+
+function onStateClick(event, d){
+  const abbrev=getAbbrev(d.id), sd=stateData[abbrev];
+  if(!sd) return;
+  selectedState=abbrev;
+  const col=PEOPLE[sd.isr]?.color||'#fff';
+  const totalISRPop=Object.values(stateData).filter(s=>s.isr===sd.isr).reduce((a,s)=>a+s.pop,0);
+
+  document.getElementById('state-detail').innerHTML=`
+    <div class="state-detail">
+      <div class="sd-name" style="color:${col}">${sd.name}</div>
+      ${sd.isNew?`<div class="sd-new">★ Newly Assigned</div>`:''}
+      ${sd.pending?`<div class="sd-new" style="color:#22d3ee;background:rgba(34,211,238,.08);border-color:rgba(34,211,238,.3)">⚠️ Pending Assignment</div>`:''}
+      <div class="sd-row"><span>Abbrev</span><span>${abbrev}</span></div>
+      <div class="sd-row"><span>ISR</span><span style="color:${PEOPLE[sd.isr]?.color}">${sd.isr}</span></div>
+      <div class="sd-row"><span>RSM</span><span style="color:${PEOPLE[sd.rsm]?.color||'#fff'}">${sd.rsm}</span></div>
+      <div class="sd-row"><span>ASM(s)</span><span>${sd.asm.map(a=>`<span style="color:${PEOPLE[a]?.color}">${a}</span>`).join('<br>')}</span></div>
+      <div class="sd-row"><span>Region</span><span>${PEOPLE[sd.isr]?.region||''}</span></div>
+      <div class="sd-row"><span>Population</span><span>${fmtPopFull(sd.pop)}</span></div>
+      <div class="sd-row"><span>% of US</span><span>${(sd.pop/334335720*100).toFixed(2)}%</span></div>
+      <div class="sd-row"><span>% of ISR Territory</span><span>${(sd.pop/totalISRPop*100).toFixed(1)}%</span></div>
+      ${sd.changeNote?`<div class="sd-row"><span>Change</span><span style="color:var(--accent)">${sd.changeNote}</span></div>`:''}
+    </div>
+  `;
+  document.getElementById('sidebar').scrollTop=0;
+
+  // Highlight selected state border
+  statesG.selectAll('.state-path')
+    .classed('selected-state', dd=>getAbbrev(dd.id)===abbrev);
+}
+
+// ── Tooltip position ──
+function posTip(el,ev){
+  const x=ev.clientX, y=ev.clientY;
+  const ew=el.offsetWidth||230, eh=el.offsetHeight||160;
+  let l=x+15, t=y-40;
+  if(l+ew>window.innerWidth-10) l=x-ew-15;
+  if(t+eh>window.innerHeight-10) t=y-eh+10;
+  if(t<10) t=10;
+  el.style.left=l+'px'; el.style.top=t+'px';
+}
+
+// ════════════════════════════════════════════════════════════════
+// CONTROLS
+// ════════════════════════════════════════════════════════════════
+function setLayer(layer){
+  currentLayer=layer;
+  ['isr','rsm','asm'].forEach(l=>{
+    const btn=document.getElementById('btn-'+l);
+    btn.className='lbtn'+(l===layer?` active-${l}`:'');
+  });
+  buildLegend();
+  colorStates();
+  const caNote=document.getElementById('ca-note');
+  caNote.style.display=(layer==='asm')?'block':'none';
+}
+
+function toggleMarkers(){
+  showMarkers=!showMarkers;
+  const btn=document.getElementById('btn-markers');
+  btn.classList.toggle('on',showMarkers);
+  drawMarkers();
+}
+
+function toggleNew(){
+  showNew=!showNew;
+  const btn=document.getElementById('btn-new');
+  btn.classList.toggle('on',showNew);
+  newG.style('display',showNew?'block':'none');
+}
+
+function toggleCompare(){
+  compareMode=!compareMode;
+  const btn=document.getElementById('btn-compare');
+  btn.classList.toggle('on',compareMode);
+  document.getElementById('compare-panel').style.display=compareMode?'block':'none';
+  document.getElementById('dir-mode-label').textContent=compareMode?'check to compare':'click to highlight';
+  if(!compareMode){ selectedPeople.clear(); updatePersonRowUI(); }
+  highlightPerson=null;
+  colorStates();
+  updatePersonRowUI();
+}
+
+function clearComparisons(){ selectedPeople.clear(); updatePersonRowUI(); colorStates(); updateCompareUI(); }
+function selectAllISR(){ ['Alex Kazan','Justin Wing','Rachel Killion'].forEach(p=>selectedPeople.add(p)); updatePersonRowUI(); colorStates(); updateCompareUI(); }
+function selectAllRSM(){ ['Austin Anderson','Brandon Grim','John Hicks'].forEach(p=>selectedPeople.add(p)); updatePersonRowUI(); colorStates(); updateCompareUI(); }
+function selectAllASM(){ Object.entries(PEOPLE).filter(([,p])=>p.type==='asm'&&!p.terminated).forEach(([n])=>selectedPeople.add(n)); updatePersonRowUI(); colorStates(); updateCompareUI(); }
+
+function updateHighlight(){
+  colorStates();
+  updatePersonRowUI();
+}
+
+function updateCompareUI(){
+  const cnt=document.getElementById('compare-count');
+  cnt.textContent=selectedPeople.size+' selected';
+  const oi=document.getElementById('overlap-info');
+  if(selectedPeople.size<2){ oi.style.display='none'; return; }
+
+  // Find overlap states
+  const overlapStates=[];
+  Object.entries(stateData).forEach(([abbrev,sd])=>{
+    const covered=getCoveredBy(abbrev);
+    const hits=[...selectedPeople].filter(p=>covered.includes(p));
+    if(hits.length>1) overlapStates.push({abbrev, state:sd.name, people:hits});
+  });
+
+  colorStates();
+
+  if(overlapStates.length===0){
+    oi.style.display='block';
+    oi.innerHTML=`<div class="overlap-bar"><div class="ob-title">No geographic overlap</div><div class="ob-body">Selected people have separate territories.</div></div>`;
+  } else {
+    oi.style.display='block';
+    oi.innerHTML=`<div class="overlap-bar"><div class="ob-title">⚡ ${overlapStates.length} Overlap States</div><div class="ob-body">(shown in gold)<br><span class="ob-states">${overlapStates.map(o=>o.abbrev).join(', ')}</span></div></div>`;
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════════════
+buildDirectory();
+buildPopSummary();
+
+// Layer button initial state
+document.getElementById('btn-isr').className='lbtn active-isr';
+
+// Double-click to reset zoom
+svg.on('dblclick.zoom',null).on('dblclick',()=>{
+  svg.transition().duration(500).call(zoom.transform, d3.zoomIdentity);
+});
+</script>
 </body>
 </html>
