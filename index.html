@@ -152,6 +152,157 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 .zoom-hint { position:absolute; top:14px; right:14px; background:rgba(11,22,34,.8); border:1px solid var(--border); border-radius:20px; padding:4px 12px; font-size:.66rem; color:var(--text3); pointer-events:none; }
 
 /* CA note */
+/* ── SEARCH BAR ── */
+.search-wrap {
+  position:absolute;
+  top:14px;
+  left:14px;
+  z-index:200;
+  width:280px;
+}
+.search-input-row {
+  display:flex;
+  align-items:center;
+  background:rgba(11,22,34,.94);
+  border:1.5px solid var(--border2);
+  border-radius:22px;
+  padding:0 14px;
+  gap:8px;
+  backdrop-filter:blur(10px);
+  transition:border-color .15s, box-shadow .15s;
+  box-shadow:0 4px 24px rgba(0,0,0,.4);
+}
+.search-wrap:focus-within .search-input-row {
+  border-color:#4b9dd4;
+  box-shadow:0 0 0 3px rgba(75,157,212,.15), 0 4px 24px rgba(0,0,0,.4);
+}
+.search-icon { color:var(--text3); font-size:.9rem; flex-shrink:0; }
+.search-input {
+  background:transparent;
+  border:none;
+  outline:none;
+  color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  font-size:.82rem;
+  padding:9px 0;
+  width:100%;
+  caret-color:#4b9dd4;
+}
+.search-input::placeholder { color:var(--text3); }
+.search-clear {
+  background:none;
+  border:none;
+  color:var(--text3);
+  cursor:pointer;
+  font-size:.85rem;
+  padding:2px 4px;
+  border-radius:50%;
+  line-height:1;
+  display:none;
+  transition:color .12s;
+}
+.search-clear:hover { color:var(--text); }
+.search-clear.visible { display:block; }
+
+.search-results {
+  margin-top:6px;
+  background:rgba(11,22,34,.97);
+  border:1px solid var(--border2);
+  border-radius:12px;
+  overflow:hidden;
+  backdrop-filter:blur(12px);
+  box-shadow:0 8px 32px rgba(0,0,0,.55);
+  display:none;
+  max-height:420px;
+  overflow-y:auto;
+}
+.search-results::-webkit-scrollbar { width:3px; }
+.search-results::-webkit-scrollbar-thumb { background:var(--border2); }
+.search-results.open { display:block; }
+
+.sr-hint {
+  padding:10px 14px;
+  font-size:.71rem;
+  color:var(--text3);
+  font-style:italic;
+}
+.sr-item {
+  padding:10px 14px;
+  cursor:pointer;
+  border-bottom:1px solid var(--border);
+  transition:background .1s;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.sr-item:last-child { border-bottom:none; }
+.sr-item:hover { background:var(--bg3); }
+.sr-item.active { background:var(--bg4); }
+.sr-abbrev {
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:1.1rem;
+  font-weight:800;
+  width:28px;
+  flex-shrink:0;
+}
+.sr-name { font-size:.78rem; font-weight:500; flex:1; }
+.sr-isr-dot { width:8px; height:8px; border-radius:2px; flex-shrink:0; }
+
+/* Search result detail card */
+.sr-card {
+  padding:0;
+  display:none;
+}
+.sr-card.open { display:block; }
+.sr-card-inner {
+  padding:14px;
+  border-top:1px solid var(--border);
+  background:var(--bg3);
+}
+.sr-card-state {
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:1.5rem;
+  font-weight:800;
+  margin-bottom:10px;
+}
+.sr-card-row {
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  font-size:.72rem;
+  color:var(--text3);
+  margin-bottom:6px;
+  gap:10px;
+}
+.sr-card-row span:last-child {
+  color:var(--text);
+  font-weight:500;
+  text-align:right;
+  max-width:58%;
+}
+.sr-card-divider { border:none; border-top:1px solid var(--border); margin:8px 0; }
+.sr-card-split {
+  font-size:.68rem;
+  color:#22d3ee;
+  line-height:1.5;
+  background:rgba(34,211,238,.06);
+  border:1px solid rgba(34,211,238,.2);
+  border-radius:6px;
+  padding:6px 9px;
+  margin-top:6px;
+}
+.sr-close {
+  float:right;
+  background:none;
+  border:none;
+  color:var(--text3);
+  cursor:pointer;
+  font-size:1rem;
+  line-height:1;
+  margin-left:8px;
+}
+.sr-close:hover { color:var(--text); }
+
 .ca-note { position:absolute; top:14px; left:50%; transform:translateX(-50%); background:rgba(185,111,245,.1); border:1px solid rgba(185,111,245,.35); border-radius:20px; padding:4px 14px; font-size:.68rem; color:rgba(185,111,245,.9); pointer-events:none; white-space:nowrap; }
 </style>
 </head>
@@ -193,7 +344,17 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
     <div class="mtip" id="mtip"></div>
     <div class="legend" id="legend"></div>
     <div class="zoom-hint">Scroll to zoom · Dbl-click to reset</div>
-    <div class="ca-note" id="ca-note" style="display:none">★ California: Bill Fanara (NorCal) + Al Cervantes (SoCal) — state-level map cannot show county split</div>
+    <div class="ca-note" id="ca-note" style="display:none">★ CA: Bill Fanara (NorCal) + Al Cervantes (SoCal) · TX: Austin Anderson (N/W) + Eddie Burnett (Houston/S) · PA: John Hicks (East/Philly) + Brandon Grim (West/Pittsburgh) — stripe = split territory</div>
+
+    <!-- Search Bar -->
+    <div class="search-wrap" id="search-wrap">
+      <div class="search-input-row">
+        <span class="search-icon">🔍</span>
+        <input class="search-input" id="search-input" type="text" placeholder="Search state… e.g. Texas or TX" autocomplete="off" spellcheck="false">
+        <button class="search-clear" id="search-clear" onclick="clearSearch()">✕</button>
+      </div>
+      <div class="search-results" id="search-results"></div>
+    </div>
   </div>
 
   <!-- SIDEBAR -->
@@ -246,11 +407,19 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
       <div id="pop-summary"></div>
     </div>
 
-    <!-- Note -->
+    <!-- Notes -->
     <div class="sb-section">
-      <div class="note-pill">
+      <div class="note-pill" style="margin-bottom:7px">
         <span class="np-icon">📍</span>
-        <span><strong style="color:var(--text)">CA Territory Split:</strong> Bill Fanara covers Northern California (roughly north of LA metro). Al Cervantes covers Southern California (LA metro south to Mexican border) + Hawaii. Map colors CA as dual-coverage in ASM view.</span>
+        <span><strong style="color:var(--text)">CA Split:</strong> Bill Fanara = NorCal. Al Cervantes = SoCal (LA metro → Mexico border) + Hawaii. Shown as diagonal stripe in ASM view.</span>
+      </div>
+      <div class="note-pill" style="margin-bottom:7px;background:rgba(34,211,238,.05);border-color:rgba(34,211,238,.2);color:#22d3ee">
+        <span class="np-icon">✂</span>
+        <span><strong style="color:var(--text)">TX Split:</strong> Eddie Burnett = Houston & South Texas. Austin Anderson = Austin, North Texas & West Texas.</span>
+      </div>
+      <div class="note-pill" style="background:rgba(42,144,96,.07);border-color:rgba(42,144,96,.25);color:#5dbf8e">
+        <span class="np-icon">✂</span>
+        <span><strong style="color:var(--text)">PA Split:</strong> John Hicks = Philadelphia & Eastern PA corridor. Brandon Grim = Pittsburgh, Erie & Western PA. Split line ≈ center of state.</span>
       </div>
     </div>
     <div style="height:16px"></div>
@@ -287,12 +456,13 @@ const PEOPLE = {
   'Matt Calabrese':{ type:'asm', color:'#ff9a3c', role:'ASM', region:'South',               title:'Area Sales Mgr',      city:'Orlando, FL',          homeISR:'Alex Kazan' },
   'Eddie Burnett': { type:'asm', color:'#f5c518', role:'ASM', region:'South',               title:'Area Sales Mgr',      city:'Missouri City, TX',    homeISR:'Alex Kazan' },
   'Maggie Leis':   { type:'asm', color:'#26de81', role:'ASM', region:'Great Lakes/Plains',  title:'Area Sales Mgr',      city:'Columbus, OH',         homeISR:'Justin Wing' },
-  'Bill Fanara':   { type:'asm', color:'#4c7ef3', role:'ASM', region:'Great Lakes/Plains',  title:'Area Sales Mgr',      city:'Aptos, CA',            homeISR:'Justin Wing', note:'Expanded: absorbed Kris Latimer territory (AK,ID,OR,WA)' },
+  'Bill Fanara':   { type:'asm', color:'#4c7ef3', role:'ASM', region:'Great Lakes/Plains',  title:'Area Sales Mgr',      city:'Aptos, CA',            homeISR:'Justin Wing', note:'NorCal only (OR/WA/AK/ID moved to Brandon Grim or Rachel)' },
   'Al Cervantes':  { type:'asm', color:'#b96ff5', role:'ASM', region:'Great Lakes/Plains',  title:'Area Sales Mgr',      city:'Tustin, CA',           homeISR:'Justin Wing', note:'SoCal (LA→Mexico border) + Hawaii' },
-  'Sam Girgenti':  { type:'asm', color:'#f47abf', role:'ASM', region:'Northeast/West',      title:'Area Sales Mgr',      city:'Melville, NY',         homeISR:'Rachel Killion' },
-  'Lindsay Hydorn':{ type:'asm', color:'#fd9f44', role:'ASM', region:'Northeast/West',      title:'Area Sales Mgr',      city:'New York, NY',         homeISR:'Rachel Killion' },
-  'Derek Bushey':  { type:'asm', color:'#38d9a9', role:'ASM', region:'Northeast/West',      title:'Area Sales Mgr',      city:'Scottsdale, AZ',       homeISR:'Rachel Killion', note:'Reduced: SoCal transferred to Al Cervantes' },
-  'Dave Carlin':   { type:'asm', color:'#a0d640', role:'ASM', region:'Northeast/West',      title:'Area Sales Mgr',      city:'West Jordan, UT',      homeISR:'Rachel Killion' },
+  'Sam Girgenti':  { type:'asm', color:'#f47abf', role:'ASM', region:'Northeast/West',      title:'Area Sales Mgr',      city:'Melville, NY',         homeISR:'Rachel Killion', note:'NY & NJ primary rep' },
+  'Lindsay Hydorn':{ type:'asm', color:'#fd9f44', role:'ASM', region:'Northeast/West',      title:'Area Sales Mgr',      city:'New York, NY',         homeISR:'Rachel Killion', note:'NY & NJ primary rep' },
+  'Derek Bushey':  { type:'asm', color:'#38d9a9', role:'ASM', region:'Northeast/West',      title:'Area Sales Mgr',      city:'Scottsdale, AZ',       homeISR:'Rachel Killion', note:'AZ, NV, NM — SoCal transferred to Al Cervantes' },
+  'Dave Carlin':   { type:'asm', color:'#a0d640', role:'ASM', region:'Northeast/West',      title:'Area Sales Mgr',      city:'West Jordan, UT',      homeISR:'Rachel Killion', note:'UT, CO, WY, ID' },
+  'Jason G.':      { type:'asm', color:'#e879f9', role:'ASM', region:'Northeast / New England', title:'Area Sales Mgr', city:'New England (TBD)',     homeISR:'Rachel Killion', note:'New England: CT, ME, MA, NH, RI, VT' },
 
   // Terminated
   'Kris Latimer':  { type:'asm', color:'#666', role:'ASM', region:'Pacific NW', title:'TERMINATED', terminated:true, homeISR:'Justin Wing' },
@@ -302,56 +472,56 @@ const PEOPLE = {
 // ISR covers same geographic states as RSM for that region
 // State → who covers at each level
 const stateData = {
-  AL:{ name:'Alabama',        isr:'Alex Kazan',    rsm:'Austin Anderson', asm:['Austin Anderson'],        pop:5108468,  isNew:false },
-  AK:{ name:'Alaska',         isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Bill Fanara'],             pop:733583,   isNew:true,  changeNote:'Was Kris Latimer → Bill Fanara' },
-  AZ:{ name:'Arizona',        isr:'Rachel Killion',rsm:'John Hicks',     asm:['Derek Bushey'],            pop:7431344,  isNew:false },
-  AR:{ name:'Arkansas',       isr:'Alex Kazan',    rsm:'Austin Anderson', asm:['Eddie Burnett'],           pop:3067732,  isNew:true },
-  CA:{ name:'California',     isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Bill Fanara','Al Cervantes'],pop:38965193, isNew:false, dualCA:true },
-  CO:{ name:'Colorado',       isr:'Rachel Killion',rsm:'John Hicks',     asm:['Dave Carlin'],             pop:5877610,  isNew:false },
-  CT:{ name:'Connecticut',    isr:'Rachel Killion',rsm:'John Hicks',     asm:['Lindsay Hydorn'],          pop:3617176,  isNew:false },
-  DE:{ name:'Delaware',       isr:'Rachel Killion',rsm:'John Hicks',     asm:['Lindsay Hydorn'],          pop:1031890,  isNew:true },
-  FL:{ name:'Florida',        isr:'Alex Kazan',    rsm:'Austin Anderson', asm:['Matt Calabrese'],          pop:22610726, isNew:false },
-  GA:{ name:'Georgia',        isr:'Alex Kazan',    rsm:'Austin Anderson', asm:['Tim Flood'],               pop:11029227, isNew:false },
-  HI:{ name:'Hawaii',         isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Al Cervantes'],            pop:1435138,  isNew:false },
-  ID:{ name:'Idaho',          isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Bill Fanara'],             pop:1964726,  isNew:true,  changeNote:'Was Kris Latimer → Bill Fanara' },
-  IL:{ name:'Illinois',       isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Brandon Grim'],            pop:12549689, isNew:false, changeNote:'Was Vince Murdocco → Brandon Grim' },
-  IN:{ name:'Indiana',        isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Maggie Leis'],             pop:6862199,  isNew:false },
-  IA:{ name:'Iowa',           isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Maggie Leis'],             pop:3207004,  isNew:false },
-  KS:{ name:'Kansas',         isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Brandon Grim'],            pop:2940865,  isNew:false, changeNote:'Was Vince Murdocco → Brandon Grim' },
-  KY:{ name:'Kentucky',       isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Maggie Leis'],             pop:4526154,  isNew:false },
-  LA:{ name:'Louisiana',      isr:'Alex Kazan',    rsm:'Austin Anderson', asm:['Austin Anderson'],         pop:4573749,  isNew:false },
-  ME:{ name:'Maine',          isr:'Rachel Killion',rsm:'John Hicks',     asm:['Lindsay Hydorn'],          pop:1395722,  isNew:true },
-  MD:{ name:'Maryland',       isr:'Rachel Killion',rsm:'John Hicks',     asm:['Lindsay Hydorn'],          pop:6180253,  isNew:true },
-  MA:{ name:'Massachusetts',  isr:'Rachel Killion',rsm:'John Hicks',     asm:['Lindsay Hydorn','Sam Girgenti'],pop:7001399, isNew:true },
-  MI:{ name:'Michigan',       isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Brandon Grim'],            pop:10037261, isNew:false },
-  MN:{ name:'Minnesota',      isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Brandon Grim'],            pop:5737915,  isNew:false, changeNote:'Was Vince Murdocco → Brandon Grim' },
-  MS:{ name:'Mississippi',    isr:'Alex Kazan',    rsm:'Austin Anderson', asm:['Austin Anderson'],         pop:2939690,  isNew:true },
-  MO:{ name:'Missouri',       isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Maggie Leis'],             pop:6196156,  isNew:true },
-  MT:{ name:'Montana',        isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Brandon Grim'],            pop:1132812,  isNew:true,  changeNote:'Was Vince Murdocco → Brandon Grim' },
-  NE:{ name:'Nebraska',       isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Brandon Grim'],            pop:2001876,  isNew:true,  changeNote:'Was Vince Murdocco → Brandon Grim' },
-  NV:{ name:'Nevada',         isr:'Rachel Killion',rsm:'John Hicks',     asm:['Derek Bushey'],            pop:3267188,  isNew:false },
-  NH:{ name:'New Hampshire',  isr:'Rachel Killion',rsm:'John Hicks',     asm:['Lindsay Hydorn'],          pop:1402054,  isNew:true },
-  NJ:{ name:'New Jersey',     isr:'Rachel Killion',rsm:'John Hicks',     asm:['Lindsay Hydorn','Sam Girgenti'],pop:9290841, isNew:false },
-  NM:{ name:'New Mexico',     isr:'Rachel Killion',rsm:'John Hicks',     asm:['Derek Bushey'],            pop:2114371,  isNew:true },
-  NY:{ name:'New York',       isr:'Rachel Killion',rsm:'John Hicks',     asm:['Lindsay Hydorn','Sam Girgenti'],pop:19571216, isNew:false },
-  NC:{ name:'North Carolina', isr:'Alex Kazan',    rsm:'Austin Anderson', asm:['Tim Flood'],               pop:10835491, isNew:false },
-  ND:{ name:'North Dakota',   isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Brandon Grim'],            pop:783926,   isNew:false, changeNote:'Was Vince Murdocco → Brandon Grim' },
-  OH:{ name:'Ohio',           isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Maggie Leis'],             pop:11785935, isNew:false },
-  OK:{ name:'Oklahoma',       isr:'Alex Kazan',    rsm:'Austin Anderson', asm:['Austin Anderson'],         pop:4053824,  isNew:false },
-  OR:{ name:'Oregon',         isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Bill Fanara'],             pop:4233358,  isNew:true,  changeNote:'Was Kris Latimer → Bill Fanara' },
-  PA:{ name:'Pennsylvania',   isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Brandon Grim'],            pop:12961683, isNew:false },
-  RI:{ name:'Rhode Island',   isr:'Rachel Killion',rsm:'John Hicks',     asm:['Lindsay Hydorn','Sam Girgenti'],pop:1095610, isNew:true },
-  SC:{ name:'South Carolina', isr:'Alex Kazan',    rsm:'Austin Anderson', asm:['Tim Flood'],               pop:5373555,  isNew:false },
-  SD:{ name:'South Dakota',   isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Brandon Grim'],            pop:919318,   isNew:false, changeNote:'Was Vince Murdocco → Brandon Grim' },
-  TN:{ name:'Tennessee',      isr:'Alex Kazan',    rsm:'Austin Anderson', asm:['Tim Flood'],               pop:7126489,  isNew:true },
-  TX:{ name:'Texas',          isr:'Alex Kazan',    rsm:'Austin Anderson', asm:['Austin Anderson','Eddie Burnett'],pop:30503301, isNew:false },
-  UT:{ name:'Utah',           isr:'Rachel Killion',rsm:'John Hicks',     asm:['Dave Carlin'],             pop:3417734,  isNew:false },
-  VT:{ name:'Vermont',        isr:'Rachel Killion',rsm:'John Hicks',     asm:['Lindsay Hydorn'],          pop:647464,   isNew:true },
-  VA:{ name:'Virginia',       isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Brandon Grim'],            pop:8715698,  isNew:false, changeNote:'Was Vince Murdocco → Brandon Grim' },
-  WA:{ name:'Washington',     isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Bill Fanara'],             pop:7812880,  isNew:true,  changeNote:'Was Kris Latimer → Bill Fanara' },
-  WV:{ name:'West Virginia',  isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Brandon Grim'],            pop:1770071,  isNew:false },
-  WI:{ name:'Wisconsin',      isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Brandon Grim'],            pop:5892539,  isNew:false, changeNote:'Was Vince Murdocco → Brandon Grim' },
-  WY:{ name:'Wyoming',        isr:'Rachel Killion',rsm:'John Hicks',     asm:['Dave Carlin'],             pop:584057,   isNew:false },
+  AL:{ name:'Alabama',        isr:'Alex Kazan',    rsm:'Austin Anderson', asm:['Austin Anderson'],                 pop:5108468,  isNew:false },
+  AK:{ name:'Alaska',         isr:'Brandon Grim',  rsm:'Brandon Grim',   asm:['Brandon Grim'],                    pop:733583,   isNew:true,  changeNote:'RSM direct · was Justin Wing / Bill Fanara' },
+  AZ:{ name:'Arizona',        isr:'Rachel Killion',rsm:'John Hicks',     asm:['Derek Bushey'],                    pop:7431344,  isNew:false },
+  AR:{ name:'Arkansas',       isr:'Brandon Grim',  rsm:'Brandon Grim',   asm:['Brandon Grim'],                    pop:3067732,  isNew:true,  changeNote:'RSM direct · moved from Alex Kazan' },
+  CA:{ name:'California',     isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Bill Fanara','Al Cervantes'],       pop:38965193, isNew:false, dualCA:true },
+  CO:{ name:'Colorado',       isr:'Rachel Killion',rsm:'John Hicks',     asm:['Dave Carlin'],                     pop:5877610,  isNew:false },
+  CT:{ name:'Connecticut',    isr:'Rachel Killion',rsm:'John Hicks',     asm:['Jason G.'],                        pop:3617176,  isNew:false, changeNote:'ASM → Jason G. (was Lindsay Hydorn)' },
+  DE:{ name:'Delaware',       isr:'John Hicks',    rsm:'John Hicks',     asm:['John Hicks'],                      pop:1031890,  isNew:true,  changeNote:'RSM direct · was Rachel Killion / Lindsay Hydorn' },
+  FL:{ name:'Florida',        isr:'Alex Kazan',    rsm:'Austin Anderson', asm:['Matt Calabrese'],                 pop:22610726, isNew:false },
+  GA:{ name:'Georgia',        isr:'Alex Kazan',    rsm:'Austin Anderson', asm:['Tim Flood'],                      pop:11029227, isNew:false },
+  HI:{ name:'Hawaii',         isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Al Cervantes'],                    pop:1435138,  isNew:false },
+  ID:{ name:'Idaho',          isr:'Rachel Killion',rsm:'John Hicks',     asm:['Dave Carlin'],                     pop:1964726,  isNew:true,  changeNote:'ISR changed · was Justin Wing / Bill Fanara → Rachel Killion / Dave Carlin' },
+  IL:{ name:'Illinois',       isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Brandon Grim'],                    pop:12549689, isNew:false, changeNote:'Was Vince Murdocco → Brandon Grim' },
+  IN:{ name:'Indiana',        isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Maggie Leis'],                     pop:6862199,  isNew:false },
+  IA:{ name:'Iowa',           isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Brandon Grim'],                    pop:3207004,  isNew:false, changeNote:'ASM changed from Maggie Leis → Brandon Grim' },
+  KS:{ name:'Kansas',         isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Brandon Grim'],                    pop:2940865,  isNew:false, changeNote:'Was Vince Murdocco → Brandon Grim' },
+  KY:{ name:'Kentucky',       isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Maggie Leis'],                     pop:4526154,  isNew:false },
+  LA:{ name:'Louisiana',      isr:'Alex Kazan',    rsm:'Austin Anderson', asm:['Austin Anderson'],                pop:4573749,  isNew:false },
+  ME:{ name:'Maine',          isr:'Rachel Killion',rsm:'John Hicks',     asm:['Jason G.'],                        pop:1395722,  isNew:false, changeNote:'ASM → Jason G. (was Lindsay Hydorn)' },
+  MD:{ name:'Maryland',       isr:'John Hicks',    rsm:'John Hicks',     asm:['John Hicks'],                      pop:6180253,  isNew:true,  changeNote:'RSM direct · was Rachel Killion / Lindsay Hydorn' },
+  MA:{ name:'Massachusetts',  isr:'Rachel Killion',rsm:'John Hicks',     asm:['Jason G.'],                        pop:7001399,  isNew:false, changeNote:'ASM → Jason G. (was Lindsay Hydorn / Sam Girgenti)' },
+  MI:{ name:'Michigan',       isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Brandon Grim'],                    pop:10037261, isNew:false },
+  MN:{ name:'Minnesota',      isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Brandon Grim'],                    pop:5737915,  isNew:false, changeNote:'Was Vince Murdocco → Brandon Grim' },
+  MS:{ name:'Mississippi',    isr:'Alex Kazan',    rsm:'Austin Anderson', asm:['Austin Anderson'],                pop:2939690,  isNew:false },
+  MO:{ name:'Missouri',       isr:'Alex Kazan',    rsm:'Austin Anderson', asm:['Austin Anderson'],                pop:6196156,  isNew:true,  changeNote:'Moved from Justin Wing / Maggie Leis → Alex Kazan / Austin Anderson' },
+  MT:{ name:'Montana',        isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Brandon Grim'],                    pop:1132812,  isNew:false, changeNote:'Was Vince Murdocco → Brandon Grim' },
+  NE:{ name:'Nebraska',       isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Brandon Grim'],                    pop:2001876,  isNew:false, changeNote:'Was Vince Murdocco → Brandon Grim' },
+  NV:{ name:'Nevada',         isr:'Rachel Killion',rsm:'John Hicks',     asm:['Derek Bushey'],                    pop:3267188,  isNew:false },
+  NH:{ name:'New Hampshire',  isr:'Rachel Killion',rsm:'John Hicks',     asm:['Jason G.'],                        pop:1402054,  isNew:false, changeNote:'ASM → Jason G. (was Lindsay Hydorn)' },
+  NJ:{ name:'New Jersey',     isr:'Rachel Killion',rsm:'John Hicks',     asm:['Lindsay Hydorn','Sam Girgenti'],   pop:9290841,  isNew:false, changeNote:'Lindsay Hydorn + Sam Girgenti listed as primary owners' },
+  NM:{ name:'New Mexico',     isr:'Rachel Killion',rsm:'John Hicks',     asm:['Derek Bushey'],                    pop:2114371,  isNew:false },
+  NY:{ name:'New York',       isr:'Rachel Killion',rsm:'John Hicks',     asm:['Lindsay Hydorn','Sam Girgenti'],   pop:19571216, isNew:false, changeNote:'Lindsay Hydorn + Sam Girgenti listed as primary owners' },
+  NC:{ name:'North Carolina', isr:'Alex Kazan',    rsm:'Austin Anderson', asm:['Tim Flood'],                      pop:10835491, isNew:false },
+  ND:{ name:'North Dakota',   isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Brandon Grim'],                    pop:783926,   isNew:false, changeNote:'Was Vince Murdocco → Brandon Grim' },
+  OH:{ name:'Ohio',           isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Maggie Leis'],                     pop:11785935, isNew:false },
+  OK:{ name:'Oklahoma',       isr:'Alex Kazan',    rsm:'Austin Anderson', asm:['Austin Anderson'],                pop:4053824,  isNew:false },
+  OR:{ name:'Oregon',         isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Brandon Grim'],                    pop:4233358,  isNew:false, changeNote:'Was Kris Latimer → Bill Fanara → now Brandon Grim' },
+  PA:{ name:'Pennsylvania',   isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['John Hicks','Brandon Grim'],       pop:12961683, isNew:false, splitNote:'East PA (Philly & eastern corridor) → John Hicks · West PA (Pittsburgh / Erie) → Brandon Grim' },
+  RI:{ name:'Rhode Island',   isr:'Rachel Killion',rsm:'John Hicks',     asm:['Jason G.'],                        pop:1095610,  isNew:false, changeNote:'ASM → Jason G. (was Lindsay Hydorn / Sam Girgenti)' },
+  SC:{ name:'South Carolina', isr:'Alex Kazan',    rsm:'Austin Anderson', asm:['Tim Flood'],                      pop:5373555,  isNew:false },
+  SD:{ name:'South Dakota',   isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Brandon Grim'],                    pop:919318,   isNew:false, changeNote:'Was Vince Murdocco → Brandon Grim' },
+  TN:{ name:'Tennessee',      isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Maggie Leis'],                     pop:7126489,  isNew:false, changeNote:'Moved from Alex Kazan / Tim Flood → Justin Wing / Maggie Leis' },
+  TX:{ name:'Texas',          isr:'Alex Kazan',    rsm:'Austin Anderson', asm:['Austin Anderson','Eddie Burnett'],pop:30503301, isNew:false, splitNote:'Eddie Burnett: Houston & South TX · Austin Anderson: Austin, North TX & West TX' },
+  UT:{ name:'Utah',           isr:'Rachel Killion',rsm:'John Hicks',     asm:['Dave Carlin'],                     pop:3417734,  isNew:false },
+  VT:{ name:'Vermont',        isr:'Rachel Killion',rsm:'John Hicks',     asm:['Jason G.'],                        pop:647464,   isNew:false, changeNote:'ASM → Jason G. (was Lindsay Hydorn)' },
+  VA:{ name:'Virginia',       isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['John Hicks'],                      pop:8715698,  isNew:false, changeNote:'ASM changed from Brandon Grim → John Hicks' },
+  WA:{ name:'Washington',     isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Brandon Grim'],                    pop:7812880,  isNew:false, changeNote:'Was Kris Latimer → Bill Fanara → now Brandon Grim' },
+  WV:{ name:'West Virginia',  isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Brandon Grim'],                    pop:1770071,  isNew:false },
+  WI:{ name:'Wisconsin',      isr:'Justin Wing',   rsm:'Brandon Grim',   asm:['Brandon Grim'],                    pop:5892539,  isNew:false, changeNote:'Was Vince Murdocco → Brandon Grim' },
+  WY:{ name:'Wyoming',        isr:'Rachel Killion',rsm:'John Hicks',     asm:['Dave Carlin'],                     pop:584057,   isNew:false },
 };
 
 // Home base markers
@@ -372,7 +542,7 @@ const homeMarkers = [
   {name:'Dave Carlin',   lat:40.610, lng:-111.939,type:'asm'},
   {name:'Bill Fanara',   lat:36.977, lng:-121.891,type:'asm'},
   {name:'Al Cervantes',  lat:33.746, lng:-117.826,type:'asm'},
-
+  {name:'Jason G.',      lat:41.760, lng:-72.680, type:'asm'},
 ];
 
 // ════════════════════════════════════════════════════════════════
@@ -396,7 +566,10 @@ function getAbbrev(id){ const s=String(id).padStart(2,'0'); return fipsToAbbrev[
 function getStateColor(abbrev){
   const sd = stateData[abbrev];
   if(!sd) return '#222';
-  if(currentLayer==='isr') return PEOPLE[sd.isr]?.color || '#444';
+  if(currentLayer==='isr'){
+    // Some states are RSM-direct (Brandon Grim or John Hicks as ISR owner)
+    return PEOPLE[sd.isr]?.color || '#444';
+  }
   if(currentLayer==='rsm') return PEOPLE[sd.rsm]?.color || '#444';
   if(currentLayer==='asm'){
     if(sd.asm.length===1) return PEOPLE[sd.asm[0]]?.color || '#444';
@@ -452,7 +625,7 @@ function buildDirectory(){
 
   ['Alex Kazan','Justin Wing','Rachel Killion'].forEach(n=>{ const r=buildRow(n); if(r) isrList.appendChild(r); });
   ['Austin Anderson','Brandon Grim','John Hicks'].forEach(n=>{ const r=buildRow(n); if(r) rsmList.appendChild(r); });
-  ['Tim Flood','Matt Calabrese','Eddie Burnett','Maggie Leis','Bill Fanara','Al Cervantes','Sam Girgenti','Lindsay Hydorn','Derek Bushey','Dave Carlin','Kris Latimer','Vince Murdocco']
+  ['Tim Flood','Matt Calabrese','Eddie Burnett','Maggie Leis','Bill Fanara','Al Cervantes','Sam Girgenti','Lindsay Hydorn','Derek Bushey','Dave Carlin','Jason G.','Kris Latimer','Vince Murdocco']
     .forEach(n=>{ const r=buildRow(n); if(r) asmList.appendChild(r); });
 }
 
@@ -523,6 +696,8 @@ function buildLegend(){
       { color:'#e8735a', label:'Alex Kazan · South' },
       { color:'#4b9dd4', label:'Justin Wing · Great Lakes/Plains' },
       { color:'#5dbf8e', label:'Rachel Killion · NE/West' },
+      { color:'#2a7ab0', label:'Brandon Grim · AK, AR (RSM direct)' },
+      { color:'#2a9060', label:'John Hicks · DE, MD (RSM direct)' },
     ];
   } else if(currentLayer==='rsm'){
     items = [
@@ -533,17 +708,19 @@ function buildLegend(){
   } else {
     // ASM - just show a few key ones
     items = [
-      { color:'#ff6b6b',  label:'Tim Flood' },
-      { color:'#ff9a3c',  label:'Matt Calabrese' },
-      { color:'#f5c518',  label:'Eddie Burnett' },
-      { color:'#26de81',  label:'Maggie Leis' },
-      { color:'#4c7ef3',  label:'Bill Fanara (expanded)' },
-      { color:'#b96ff5',  label:'Al Cervantes (SoCal+HI)' },
-      { color:'#38d9a9',  label:'Derek Bushey (reduced)' },
-      { color:'#fd9f44',  label:'Lindsay Hydorn' },
-      { color:'#f47abf',  label:'Sam Girgenti' },
-      { color:'#a0d640',  label:'Dave Carlin' },
-      { color:'#2a7ab0',  label:'Brandon Grim (expanded)' },
+      { color:'#ff6b6b',  label:'Tim Flood · South' },
+      { color:'#ff9a3c',  label:'Matt Calabrese · South' },
+      { color:'#f5c518',  label:'Eddie Burnett · South TX' },
+      { color:'#26de81',  label:'Maggie Leis · Great Lakes' },
+      { color:'#4c7ef3',  label:'Bill Fanara · NorCal' },
+      { color:'#b96ff5',  label:'Al Cervantes · SoCal + HI' },
+      { color:'#38d9a9',  label:'Derek Bushey · AZ/NV/NM' },
+      { color:'#fd9f44',  label:'Lindsay Hydorn · NY/NJ' },
+      { color:'#f47abf',  label:'Sam Girgenti · NY/NJ' },
+      { color:'#a0d640',  label:'Dave Carlin · UT/CO/WY/ID' },
+      { color:'#e879f9',  label:'Jason G. · New England' },
+      { color:'#2a7ab0',  label:'Brandon Grim · Great Lakes+' },
+      { color:'#2a9060',  label:'John Hicks · DMV + East PA' },
     ];
   }
   el.innerHTML = `<div class="legend-title">Layer: ${currentLayer.toUpperCase()}</div>
@@ -587,9 +764,10 @@ function buildPattern(id, c1, c2){
 buildPattern('pat-CA',   PEOPLE['Bill Fanara'].color,  PEOPLE['Al Cervantes'].color);
 buildPattern('pat-NY',   PEOPLE['Lindsay Hydorn'].color,PEOPLE['Sam Girgenti'].color);
 buildPattern('pat-NJ',   PEOPLE['Lindsay Hydorn'].color,PEOPLE['Sam Girgenti'].color);
-buildPattern('pat-MA',   PEOPLE['Lindsay Hydorn'].color,PEOPLE['Sam Girgenti'].color);
-buildPattern('pat-RI',   PEOPLE['Lindsay Hydorn'].color,PEOPLE['Sam Girgenti'].color);
+buildPattern('pat-MA',   PEOPLE['Jason G.'].color,      PEOPLE['Sam Girgenti'].color);
+buildPattern('pat-RI',   PEOPLE['Jason G.'].color,      PEOPLE['Sam Girgenti'].color);
 buildPattern('pat-TX',   PEOPLE['Austin Anderson'].color,PEOPLE['Eddie Burnett'].color);
+buildPattern('pat-PA',   PEOPLE['John Hicks'].color,    PEOPLE['Brandon Grim'].color);
 buildPattern('pat-overlap', '#f0c040','#222');
 
 const zoom = d3.zoom().scaleExtent([0.7,10]).on('zoom', e=>{ g.attr('transform',e.transform); });
@@ -684,7 +862,7 @@ function colorStates(){
 }
 
 function getDualPattern(abbrev){
-  const patMap = {CA:'pat-CA',NY:'pat-NY',NJ:'pat-NJ',MA:'pat-MA',RI:'pat-RI',TX:'pat-TX'};
+  const patMap = {CA:'pat-CA',NY:'pat-NY',NJ:'pat-NJ',TX:'pat-TX',PA:'pat-PA'};
   const sd=stateData[abbrev];
   if(!sd||sd.asm.length<2) return null;
   return patMap[abbrev]||null;
@@ -747,7 +925,7 @@ function onStateHover(event, d){
     <div class="tt-row"><span>Population (2023)</span><span>${fmtPopFull(sd.pop)}</span></div>
     ${sd.isNew?`<div class="tt-new">★ Newly assigned (was blank)</div>`:''}
     ${sd.changeNote?`<div class="tt-new">↻ ${sd.changeNote}</div>`:''}
-    ${sd.pending?`<div class="tt-new" style="color:#22d3ee">⚠️ Pending: ${sd.changeNote||''}</div>`:''}
+    ${sd.splitNote?`<div class="tt-new" style="color:#22d3ee">✂ Split: ${sd.splitNote}</div>`:''}
     ${overlap.length>1?`<div class="tt-overlap">⚡ Overlap: ${overlap.join(' + ')}</div>`:''}
   `;
   tooltip.classList.add('visible');
@@ -775,6 +953,7 @@ function onStateClick(event, d){
       <div class="sd-row"><span>% of US</span><span>${(sd.pop/334335720*100).toFixed(2)}%</span></div>
       <div class="sd-row"><span>% of ISR Territory</span><span>${(sd.pop/totalISRPop*100).toFixed(1)}%</span></div>
       ${sd.changeNote?`<div class="sd-row"><span>Change</span><span style="color:var(--accent)">${sd.changeNote}</span></div>`:''}
+      ${sd.splitNote?`<div class="sd-row"><span>Split Coverage</span><span style="color:#22d3ee">${sd.splitNote}</span></div>`:''}
     </div>
   `;
   document.getElementById('sidebar').scrollTop=0;
@@ -884,6 +1063,173 @@ document.getElementById('btn-isr').className='lbtn active-isr';
 svg.on('dblclick.zoom',null).on('dblclick',()=>{
   svg.transition().duration(500).call(zoom.transform, d3.zoomIdentity);
 });
+
+// ════════════════════════════════════════════════════════════════
+// SEARCH
+// ════════════════════════════════════════════════════════════════
+const searchInput   = document.getElementById('search-input');
+const searchResults = document.getElementById('search-results');
+const searchClear   = document.getElementById('search-clear');
+
+// Build a flat searchable list from stateData
+const searchList = Object.entries(stateData).map(([abbrev, sd]) => ({
+  abbrev,
+  name: sd.name,
+  nameLower: sd.name.toLowerCase(),
+  abbrevLower: abbrev.toLowerCase(),
+}));
+
+let searchHighlightAbbrev = null;
+let activeResultIndex = -1;
+let currentResults = [];
+
+searchInput.addEventListener('input', () => {
+  const q = searchInput.value.trim().toLowerCase();
+  searchClear.classList.toggle('visible', q.length > 0);
+  if (!q) { closeSearch(); return; }
+
+  currentResults = searchList.filter(s =>
+    s.nameLower.startsWith(q) ||
+    s.abbrevLower === q ||
+    s.nameLower.includes(q)
+  ).slice(0, 8);
+
+  activeResultIndex = currentResults.length === 1 ? 0 : -1;
+  renderSearchList();
+  searchResults.classList.add('open');
+
+  // Auto-select if exact abbreviation match
+  if (currentResults.length === 1) {
+    selectSearchResult(currentResults[0].abbrev, false);
+  } else {
+    clearSearchHighlight();
+  }
+});
+
+searchInput.addEventListener('keydown', e => {
+  if (!searchResults.classList.contains('open')) return;
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    activeResultIndex = Math.min(activeResultIndex + 1, currentResults.length - 1);
+    renderSearchList();
+    if (activeResultIndex >= 0) selectSearchResult(currentResults[activeResultIndex].abbrev, false);
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    activeResultIndex = Math.max(activeResultIndex - 1, 0);
+    renderSearchList();
+    if (activeResultIndex >= 0) selectSearchResult(currentResults[activeResultIndex].abbrev, false);
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    const idx = activeResultIndex >= 0 ? activeResultIndex : 0;
+    if (currentResults[idx]) selectSearchResult(currentResults[idx].abbrev, true);
+  } else if (e.key === 'Escape') {
+    clearSearch();
+  }
+});
+
+// Close search on outside click
+document.addEventListener('click', e => {
+  if (!document.getElementById('search-wrap').contains(e.target)) {
+    closeSearch();
+  }
+});
+
+function renderSearchList() {
+  if (currentResults.length === 0) {
+    searchResults.innerHTML = `<div class="sr-hint">No states found — try a full name or 2-letter code</div>`;
+    return;
+  }
+  searchResults.innerHTML = currentResults.map((s, i) => {
+    const sd = stateData[s.abbrev];
+    const isrColor = PEOPLE[sd.isr]?.color || '#888';
+    return `<div class="sr-item${i === activeResultIndex ? ' active' : ''}" onclick="selectSearchResult('${s.abbrev}', true)">
+      <div class="sr-abbrev" style="color:${isrColor}">${s.abbrev}</div>
+      <div class="sr-name">${s.name}</div>
+      <div class="sr-isr-dot" style="background:${isrColor}"></div>
+    </div>`;
+  }).join('');
+}
+
+function selectSearchResult(abbrev, showCard) {
+  searchHighlightAbbrev = abbrev;
+  const sd = stateData[abbrev];
+  if (!sd) return;
+
+  // Highlight state on map
+  statesG.selectAll('.state-path')
+    .classed('selected-state', d => getAbbrev(d.id) === abbrev)
+    .attr('opacity', d => getAbbrev(d.id) === abbrev ? 1 : 0.25);
+
+  // Update sidebar state detail
+  const isrCol = PEOPLE[sd.isr]?.color || '#fff';
+  const totalISRPop = Object.values(stateData).filter(s => s.isr === sd.isr).reduce((a, s) => a + s.pop, 0);
+  document.getElementById('state-detail').innerHTML = `
+    <div class="state-detail">
+      <div class="sd-name" style="color:${isrCol}">${sd.name}</div>
+      ${sd.isNew ? `<div class="sd-new">★ Newly Assigned</div>` : ''}
+      <div class="sd-row"><span>Abbrev</span><span>${abbrev}</span></div>
+      <div class="sd-row"><span>ISR</span><span style="color:${PEOPLE[sd.isr]?.color}">${sd.isr}</span></div>
+      <div class="sd-row"><span>RSM</span><span style="color:${PEOPLE[sd.rsm]?.color||'#fff'}">${sd.rsm}</span></div>
+      <div class="sd-row"><span>ASM(s)</span><span>${sd.asm.map(a=>`<span style="color:${PEOPLE[a]?.color}">${a}</span>`).join('<br>')}</span></div>
+      <div class="sd-row"><span>Region</span><span>${PEOPLE[sd.isr]?.region || ''}</span></div>
+      <div class="sd-row"><span>Population</span><span>${fmtPopFull(sd.pop)}</span></div>
+      <div class="sd-row"><span>% of US</span><span>${(sd.pop/334335720*100).toFixed(2)}%</span></div>
+      <div class="sd-row"><span>% of ISR Territory</span><span>${(sd.pop/totalISRPop*100).toFixed(1)}%</span></div>
+      ${sd.changeNote ? `<div class="sd-row"><span>Change</span><span style="color:var(--accent)">${sd.changeNote}</span></div>` : ''}
+      ${sd.splitNote ? `<div class="sd-row"><span>Split Coverage</span><span style="color:#22d3ee">${sd.splitNote}</span></div>` : ''}
+    </div>
+  `;
+  document.getElementById('sidebar').scrollTop = 0;
+
+  if (!showCard) return;
+
+  // Show inline card in search results
+  const isrC  = PEOPLE[sd.isr]?.color || '#fff';
+  const rsmC  = PEOPLE[sd.rsm]?.color || '#fff';
+  const asmHtml = sd.asm.map(a => `<span style="color:${PEOPLE[a]?.color||'#fff'};font-weight:600">${a}</span>`).join(' · ');
+  searchResults.innerHTML = `
+    <div class="sr-card open">
+      <div class="sr-card-inner">
+        <button class="sr-close" onclick="clearSearch()">✕</button>
+        <div class="sr-card-state" style="color:${isrC}">${sd.name} <span style="font-size:.9rem;color:var(--text3)">${abbrev}</span></div>
+        <div class="sr-card-row"><span>ISR</span><span style="color:${isrC};font-weight:700">${sd.isr}</span></div>
+        <div class="sr-card-row"><span>RSM</span><span style="color:${rsmC}">${sd.rsm}</span></div>
+        <div class="sr-card-row"><span>ASM(s)</span><span>${asmHtml}</span></div>
+        <hr class="sr-card-divider">
+        <div class="sr-card-row"><span>Population</span><span>${fmtPopFull(sd.pop)}</span></div>
+        <div class="sr-card-row"><span>Region</span><span>${PEOPLE[sd.isr]?.region||''}</span></div>
+        ${sd.splitNote ? `<div class="sr-card-split">✂ ${sd.splitNote}</div>` : ''}
+        ${sd.changeNote ? `<div class="sr-card-split" style="color:var(--accent);background:rgba(240,192,64,.06);border-color:rgba(240,192,64,.2)">↻ ${sd.changeNote}</div>` : ''}
+      </div>
+      <div style="padding:0 14px 10px">
+        <div style="font-size:.66rem;color:var(--text3)">Press Esc or click ✕ to dismiss · Click state on map for full detail</div>
+      </div>
+    </div>`;
+  searchResults.classList.add('open');
+}
+
+function clearSearchHighlight() {
+  searchHighlightAbbrev = null;
+  statesG.selectAll('.state-path').classed('selected-state', false);
+  colorStates(); // restore normal coloring + opacity
+}
+
+function clearSearch() {
+  searchInput.value = '';
+  searchClear.classList.remove('visible');
+  searchResults.classList.remove('open');
+  searchResults.innerHTML = '';
+  currentResults = [];
+  activeResultIndex = -1;
+  clearSearchHighlight();
+}
+
+function closeSearch() {
+  searchResults.classList.remove('open');
+  if (!searchHighlightAbbrev) clearSearchHighlight();
+}
 </script>
+</body>
+</html>
 </body>
 </html>
